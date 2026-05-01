@@ -1,0 +1,158 @@
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=EB+Garamond:ital,wght@0,400;0,600;1,400&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ── Variables ─────────────────────────────────────── */
+:root {
+  --gold:        #D4AF37;
+  --gold-light:  #F0D060;
+  --gold-dark:   #A07820;
+  --bg-deep:     #12100E;
+  --bg-mid:      #1C1914;
+  --bg-panel:    #1C1810;
+  --sand-light:  #E6D5B8;
+  --sand-dark:   #8B7355;
+  --board-light: #C8A96E;
+  --board-dark:  #5a452a;
+}
+
+/* ── Base ──────────────────────────────────────────── */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body, #root {
+  height: 100%;
+}
+
+body {
+  background-color: var(--bg-deep);
+  background-image:
+    radial-gradient(ellipse at 20% 20%, rgba(212,175,55,0.04) 0%, transparent 60%),
+    radial-gradient(ellipse at 80% 80%, rgba(212,175,55,0.03) 0%, transparent 60%);
+  color: var(--sand-light);
+  font-family: 'EB Garamond', Georgia, serif;
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── Typography ────────────────────────────────────── */
+.font-display { font-family: 'Cinzel', serif; }
+.font-serif   { font-family: 'EB Garamond', Georgia, serif; }
+
+.luxury-text-gold {
+  color: var(--gold);
+  text-shadow: 0 0 20px rgba(212,175,55,0.25);
+}
+
+/* ── Panels ────────────────────────────────────────── */
+.luxury-panel {
+  background: linear-gradient(135deg, var(--bg-panel) 0%, var(--bg-mid) 100%);
+  border: 1px solid rgba(212,175,55,0.18);
+  border-radius: 6px;
+  box-shadow:
+    0 4px 24px rgba(0,0,0,0.5),
+    inset 0 1px 0 rgba(212,175,55,0.08);
+}
+
+/* ── Buttons ───────────────────────────────────────── */
+.luxury-btn {
+  background: transparent;
+  border: 1px solid rgba(212,175,55,0.35);
+  color: var(--gold);
+  font-family: 'Cinzel', serif;
+  font-size: 10px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.luxury-btn:hover {
+  background: rgba(212,175,55,0.08);
+  border-color: var(--gold);
+  box-shadow: 0 0 12px rgba(212,175,55,0.15);
+}
+
+.luxury-btn-primary {
+  background: linear-gradient(135deg, #2a2010 0%, #1a1508 100%);
+  border: 1px solid rgba(212,175,55,0.5);
+  color: var(--gold);
+  font-family: 'Cinzel', serif;
+  font-size: 10px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.4), inset 0 1px 0 rgba(212,175,55,0.1);
+}
+.luxury-btn-primary:hover {
+  background: linear-gradient(135deg, #3a3018 0%, #2a2010 100%);
+  border-color: var(--gold);
+  box-shadow: 0 4px 16px rgba(212,175,55,0.2), inset 0 1px 0 rgba(212,175,55,0.15);
+}
+.luxury-btn-primary:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* ── Board ─────────────────────────────────────────── */
+.board-outer {
+  border: 2px solid rgba(212,175,55,0.3);
+  border-radius: 4px;
+  box-shadow:
+    0 0 40px rgba(212,175,55,0.08),
+    0 8px 32px rgba(0,0,0,0.6),
+    inset 0 0 0 1px rgba(212,175,55,0.05);
+  overflow: hidden;
+}
+
+.board-grid {
+  border-color: rgba(212,175,55,0.2) !important;
+}
+
+.board-cell-light {
+  background-color: var(--board-light);
+}
+.board-cell-dark {
+  background-color: var(--board-dark);
+}
+
+/* ── Pieces ────────────────────────────────────────── */
+.piece-host {
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #e8e0d0, #a09070);
+  box-shadow:
+    2px 3px 6px rgba(0,0,0,0.5),
+    inset -1px -1px 3px rgba(0,0,0,0.3),
+    inset 1px 1px 2px rgba(255,255,255,0.4);
+  border: 1px solid rgba(120,100,60,0.4);
+}
+
+.piece-guest {
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #6b5a3a, #3a2a18);
+  box-shadow:
+    1px 2px 4px rgba(0,0,0,0.6),
+    inset -1px -1px 2px rgba(0,0,0,0.4),
+    inset 1px 1px 2px rgba(180,140,80,0.2);
+  border: 1px solid rgba(212,175,55,0.25);
+}
+
+/* ── Scrollbar ─────────────────────────────────────── */
+::-webkit-scrollbar       { width: 4px; }
+::-webkit-scrollbar-track { background: var(--bg-deep); }
+::-webkit-scrollbar-thumb {
+  background: rgba(212,175,55,0.25);
+  border-radius: 2px;
+}
+::-webkit-scrollbar-thumb:hover { background: rgba(212,175,55,0.5); }
+
+/* ── RTL Support ───────────────────────────────────── */
+[lang="ar"], [dir="rtl"] {
+  direction: rtl;
+  text-align: right;
+}
