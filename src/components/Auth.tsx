@@ -1,5 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { useTranslation } from 'react-i18next';
+import { useState, useEffect, useRef } from 'react';
 import { auth } from '../firebase/config';
 import {
   RecaptchaVerifier,
@@ -12,19 +11,17 @@ import {
 type Mode = 'choose' | 'phone' | 'email';
 
 export default function Auth() {
-  const { t } = useTranslation();
-  const [mode, setMode]           = useState<Mode>('choose');
-  const [phone, setPhone]         = useState('');
-  const [otp, setOtp]             = useState('');
-  const [email, setEmail]         = useState('');
-  const [password, setPassword]   = useState('');
+  const [mode, setMode]             = useState<Mode>('choose');
+  const [phone, setPhone]           = useState('');
+  const [otp, setOtp]               = useState('');
+  const [email, setEmail]           = useState('');
+  const [password, setPassword]     = useState('');
   const [isRegister, setIsRegister] = useState(false);
-  const [step, setStep]           = useState<'input' | 'otp'>('input');
-  const [error, setError]         = useState('');
-  const [loading, setLoading]     = useState(false);
-  const confirmRef                = useRef<ConfirmationResult | null>(null);
+  const [step, setStep]             = useState<'input' | 'otp'>('input');
+  const [error, setError]           = useState('');
+  const [loading, setLoading]       = useState(false);
+  const confirmRef                  = useRef<ConfirmationResult | null>(null);
 
-  // ── reCAPTCHA ──────────────────────────────────────
   useEffect(() => {
     if (mode !== 'phone') return;
     if (!window.recaptchaVerifier) {
@@ -36,7 +33,6 @@ export default function Auth() {
     }
   }, [mode]);
 
-  // ── Phone Auth ────────────────────────────────────
   const sendOtp = async () => {
     setError('');
     if (!phone.startsWith('+')) {
@@ -46,9 +42,7 @@ export default function Auth() {
     setLoading(true);
     try {
       confirmRef.current = await signInWithPhoneNumber(
-        auth,
-        phone,
-        window.recaptchaVerifier
+        auth, phone, window.recaptchaVerifier
       );
       setStep('otp');
     } catch (e: any) {
@@ -64,14 +58,13 @@ export default function Auth() {
     setLoading(true);
     try {
       await confirmRef.current.confirm(otp);
-    } catch (e: any) {
+    } catch {
       setError('رمز خاطئ، حاول مجدداً');
     } finally {
       setLoading(false);
     }
   };
 
-  // ── Email Auth ────────────────────────────────────
   const handleEmail = async () => {
     setError('');
     setLoading(true);
@@ -95,7 +88,6 @@ export default function Auth() {
     }
   };
 
-  // ── UI ─────────────────────────────────────────────
   const inputClass =
     'w-full px-4 py-3 bg-[#12100E] border border-[#4a3a2a] rounded-[4px] ' +
     'text-sm text-[#E6D5B8] placeholder:text-[#E6D5B8]/40 ' +
@@ -109,7 +101,6 @@ export default function Auth() {
     'w-full py-3 luxury-btn rounded-[4px] text-xs font-display ' +
     'font-bold uppercase tracking-widest';
 
-  // شاشة اختيار طريقة الدخول
   if (mode === 'choose') {
     return (
       <div className="w-full max-w-sm mx-auto mt-8 space-y-4 font-serif">
@@ -135,7 +126,6 @@ export default function Auth() {
     );
   }
 
-  // شاشة الهاتف
   if (mode === 'phone') {
     return (
       <div className="w-full max-w-sm mx-auto mt-8 font-serif">
@@ -147,11 +137,9 @@ export default function Auth() {
           >
             ← رجوع
           </button>
-
           <h2 className="text-base font-display font-bold uppercase tracking-[0.2em] luxury-text-gold text-center">
             {step === 'input' ? 'رقم الهاتف' : 'رمز التحقق'}
           </h2>
-
           {step === 'input' ? (
             <>
               <input
@@ -188,18 +176,14 @@ export default function Auth() {
               </button>
             </>
           )}
-
           {error && (
-            <p className="text-red-400 text-xs text-center font-display tracking-wide">
-              {error}
-            </p>
+            <p className="text-red-400 text-xs text-center font-display tracking-wide">{error}</p>
           )}
         </div>
       </div>
     );
   }
 
-  // شاشة البريد الإلكتروني
   return (
     <div className="w-full max-w-sm mx-auto mt-8 font-serif">
       <div className="luxury-panel p-8 space-y-5">
@@ -209,11 +193,9 @@ export default function Auth() {
         >
           ← رجوع
         </button>
-
         <h2 className="text-base font-display font-bold uppercase tracking-[0.2em] luxury-text-gold text-center">
           {isRegister ? 'إنشاء حساب' : 'تسجيل الدخول'}
         </h2>
-
         <input
           type="email"
           value={email}
@@ -230,24 +212,19 @@ export default function Auth() {
           className={inputClass}
           dir="ltr"
         />
-
         <button onClick={handleEmail} disabled={loading || !email || !password} className={btnPrimary}>
           {loading ? 'جار...' : isRegister ? 'إنشاء حساب' : 'دخول'}
         </button>
-
         <button
           onClick={() => { setIsRegister(r => !r); setError(''); }}
           className="text-[10px] text-center w-full uppercase tracking-widest text-[#D4AF37] opacity-60 hover:opacity-100 font-display"
         >
           {isRegister ? 'لدي حساب — دخول' : 'حساب جديد — تسجيل'}
         </button>
-
         {error && (
-          <p className="text-red-400 text-xs text-center font-display tracking-wide">
-            {error}
-          </p>
+          <p className="text-red-400 text-xs text-center font-display tracking-wide">{error}</p>
         )}
       </div>
     </div>
   );
-          }
+}
