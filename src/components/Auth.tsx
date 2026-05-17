@@ -233,17 +233,17 @@ export default function Auth() {
   // ── Choose Mode Screen ─────────────────────────────────
   if (mode === 'choose') {
     return (
-      <div className="w-full max-w-sm mx-auto mt-8 space-y-4 font-serif">
-        <div className="luxury-panel p-8 text-center space-y-6">
+      <div className="w-full max-w-sm mx-auto mt-4 sm:mt-8 space-y-3 sm:space-y-4 font-serif px-2 sm:px-0">
+        <div className="luxury-panel p-4 sm:p-8 text-center space-y-4 sm:space-y-6">
           <div className="space-y-1">
-            <h2 className="text-lg font-display font-bold uppercase tracking-[0.2em] luxury-text-gold">
+            <h2 className="text-base sm:text-lg font-display font-bold uppercase tracking-[0.2em] luxury-text-gold">
               الدخول إلى خربڤة
             </h2>
-            <p className="text-[10px] uppercase tracking-[0.25em] text-[#E6D5B8] opacity-50 font-display">
+            <p className="text-[8px] sm:text-[10px] uppercase tracking-[0.25em] text-[#E6D5B8] opacity-50 font-display">
               اختر طريقة التسجيل
             </p>
           </div>
-          <div className="flex flex-col gap-3">
+          <div className="flex flex-col gap-2 sm:gap-3">
             <button 
               onClick={() => setMode('phone')} 
               className={btnPrimary}
@@ -267,18 +267,18 @@ export default function Auth() {
   // ── Phone Auth Screen ──────────────────────────────────
   if (mode === 'phone') {
     return (
-      <div className="w-full max-w-sm mx-auto mt-8 font-serif">
+      <div className="w-full max-w-sm mx-auto mt-4 sm:mt-8 font-serif px-2 sm:px-0">
         <div id="recaptcha-container" />
-        <div className="luxury-panel p-8 space-y-5">
+        <div className="luxury-panel p-4 sm:p-8 space-y-3 sm:space-y-5">
           <button
             onClick={() => { setMode('choose'); resetForm(); }}
-            className="text-[10px] uppercase tracking-widest text-[#D4AF37] opacity-60 hover:opacity-100 font-display transition-opacity"
+            className="text-[8px] sm:text-[10px] uppercase tracking-widest text-[#D4AF37] opacity-60 hover:opacity-100 font-display transition-opacity"
             aria-label="العودة للخلف"
           >
             ← رجوع
           </button>
 
-          <h2 className="text-base font-display font-bold uppercase tracking-[0.2em] luxury-text-gold text-center">
+          <h2 className="text-sm sm:text-base font-display font-bold uppercase tracking-[0.2em] luxury-text-gold text-center">
             {step === 'input' ? 'رقم الهاتف' : 'رمز التحقق'}
           </h2>
 
@@ -349,17 +349,17 @@ export default function Auth() {
 
   // ── Email Auth Screen ──────────────────────────────────
   return (
-    <div className="w-full max-w-sm mx-auto mt-8 font-serif">
-      <div className="luxury-panel p-8 space-y-5">
+    <div className="w-full max-w-sm mx-auto mt-4 sm:mt-8 font-serif px-2 sm:px-0">
+      <div className="luxury-panel p-4 sm:p-8 space-y-3 sm:space-y-5">
         <button
           onClick={() => { setMode('choose'); resetForm(); }}
-          className="text-[10px] uppercase tracking-widest text-[#D4AF37] opacity-60 hover:opacity-100 font-display transition-opacity"
+          className="text-[8px] sm:text-[10px] uppercase tracking-widest text-[#D4AF37] opacity-60 hover:opacity-100 font-display transition-opacity"
           aria-label="العودة للخلف"
         >
           ← رجوع
         </button>
 
-        <h2 className="text-base font-display font-bold uppercase tracking-[0.2em] luxury-text-gold text-center">
+        <h2 className="text-sm sm:text-base font-display font-bold uppercase tracking-[0.2em] luxury-text-gold text-center">
           {isRegister ? 'إنشاء حساب' : 'تسجيل الدخول'}
         </h2>
 
@@ -397,13 +397,13 @@ export default function Auth() {
 
         <button
           onClick={() => { setIsRegister(r => !r); setError(''); }}
-          className="text-[10px] text-center w-full uppercase tracking-widest text-[#D4AF37] opacity-60 hover:opacity-100 font-display transition-opacity"
+          className="text-[8px] sm:text-[10px] text-center w-full uppercase tracking-widest text-[#D4AF37] opacity-60 hover:opacity-100 font-display transition-opacity"
         >
           {isRegister ? 'لدي حساب — دخول' : 'حساب جديد — تسجيل'}
         </button>
 
         {error && (
-          <div className="bg-red-900/20 border border-red-500/30 rounded px-3 py-2">
+          <div className="bg-red-900/20 border border-red-500/30 rounded px-2 sm:px-3 py-2">
             <p className="text-red-400 text-xs text-center font-display tracking-wide">
               {error}
             </p>
