@@ -135,10 +135,10 @@ export default function App() {
   //  Main App Layout
   // ══════════════════════════════════════════════════════
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen min-h-[100dvh] flex flex-col">
       {/* Header */}
       <header className="sticky top-0 z-50 backdrop-blur-xl bg-[#08070A]/80 border-b border-[#D4A853]/8">
-        <div className="flex justify-between items-center px-4 sm:px-6 py-3 max-w-2xl mx-auto">
+        <div className="flex justify-between items-center px-4 sm:px-6 py-3 max-w-lg mx-auto w-full">
           {/* Logo */}
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#D4A853] to-[#8B6D35] flex items-center justify-center shadow-md">
@@ -184,7 +184,7 @@ export default function App() {
       </header>
 
       {/* Main Content */}
-      <main className="flex-1 flex flex-col">
+      <main className="flex-1 flex flex-col items-center justify-center">
         {user ? <GameLobby /> : <Auth />}
       </main>
 

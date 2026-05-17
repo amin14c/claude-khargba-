@@ -132,8 +132,8 @@ export default function GameLobby() {
   ];
 
   return (
-    <div className="flex-1 flex items-center justify-center px-4 py-6">
-      <div className="w-full max-w-md space-y-5 animate-fade-up">
+    <div className="w-full px-4 py-6">
+      <div className="w-full max-w-md mx-auto space-y-5 animate-fade-up">
 
         {/* Game Modes */}
         <div className="glass-elevated p-6 space-y-5">
@@ -512,7 +512,7 @@ function GameBoard({ gameId, onExit }: GameBoardProps) {
   const myRole: Role = isHost ? 'host' : 'guest';
 
   return (
-    <div className="flex-1 flex flex-col items-center px-4 py-4 max-w-md mx-auto w-full animate-fade-up">
+    <div className="w-full px-4 py-4 max-w-md mx-auto animate-fade-up">
 
       {/* Header */}
       <div className="w-full flex items-center justify-between mb-4">

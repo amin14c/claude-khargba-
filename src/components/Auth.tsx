@@ -171,8 +171,8 @@ export default function Auth() {
   // ══════════════════════════════════════════════════════
   if (mode === 'choose') {
     return (
-      <div className="flex-1 flex items-center justify-center px-4 py-8">
-        <div className="w-full max-w-sm glass-elevated p-8 space-y-8 animate-scale-in">
+      <div className="w-full px-4 py-8 max-w-sm mx-auto">
+        <div className="glass-elevated p-8 space-y-8 animate-scale-in">
           {/* Header */}
           <div className="text-center space-y-2">
             <h2 className="text-2xl font-display text-gradient">Welcome</h2>
@@ -217,8 +217,8 @@ export default function Auth() {
   // ══════════════════════════════════════════════════════
   if (mode === 'phone') {
     return (
-      <div className="flex-1 flex items-center justify-center px-4 py-8">
-        <div className="w-full max-w-sm glass-elevated p-8 space-y-6 animate-fade-up">
+      <div className="w-full px-4 py-8 max-w-sm mx-auto">
+        <div className="glass-elevated p-8 space-y-6 animate-fade-up">
           <div id="recaptcha-container" />
 
           {/* Back Button */}
@@ -320,8 +320,8 @@ export default function Auth() {
   //  Email Auth Screen
   // ══════════════════════════════════════════════════════
   return (
-    <div className="flex-1 flex items-center justify-center px-4 py-8">
-      <div className="w-full max-w-sm glass-elevated p-8 space-y-6 animate-fade-up">
+    <div className="w-full px-4 py-8 max-w-sm mx-auto">
+      <div className="glass-elevated p-8 space-y-6 animate-fade-up">
         {/* Back Button */}
         <button
           onClick={() => { setMode('choose'); resetForm(); }}
