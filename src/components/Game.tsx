@@ -17,7 +17,7 @@ import {
 import { cn } from '../lib/utils';
 import { playSound } from '../lib/sounds';
 import type { GameDoc, ChatMessage, GameBoardProps } from '../types';
-import { Send, Users, Bot, Smartphone, ArrowLeft, Circle } from 'lucide-react';
+import { Send, Users, Bot, Smartphone, ArrowLeft, MessageCircle, X } from 'lucide-react';
 
 // ── Helpers ────────────────────────────────────────────
 function newGameId(): string {
@@ -28,12 +28,12 @@ function emptyBoard(): Board {
   return Array(49).fill('') as Board;
 }
 
-// ══════════════════════════════════════════════════════
-//  GameLobby
-// ══════════════════════════════════════════════════════
+// ══════════════════════════════════════════════════════════════
+//  GameLobby - Main Menu
+// ══════════════════════════════════════════════════════════════
 export default function GameLobby() {
   const { t } = useTranslation();
-  const [games, setGames]             = useState<GameDoc[]>([]);
+  const [games, setGames] = useState<GameDoc[]>([]);
   const [activeGameId, setActiveGameId] = useState<string | null>(null);
   const uid = auth.currentUser?.uid;
 
@@ -51,7 +51,7 @@ export default function GameLobby() {
       snapshot.docs.forEach((d: any) => setActiveGameId(d.id));
     };
 
-    const unsub1 = onSnapshot(myGames('hostId'),  handleMyGame,
+    const unsub1 = onSnapshot(myGames('hostId'), handleMyGame,
       e => handleFirestoreError(e, OperationType.LIST, 'games'));
     const unsub2 = onSnapshot(myGames('guestId'), handleMyGame,
       e => handleFirestoreError(e, OperationType.LIST, 'games'));
@@ -69,17 +69,17 @@ export default function GameLobby() {
 
   const createGame = async (guestId: string, status: 'waiting' | 'playing') => {
     if (!uid) return;
-    const gameId  = newGameId();
+    const gameId = newGameId();
     const gameRef = doc(db, 'games', gameId);
     try {
       await setDoc(gameRef, {
         status,
-        hostId:    uid,
+        hostId: uid,
         guestId,
-        turn:      'host' as Role,
-        board:     emptyBoard(),
-        winner:    '',
-        phase:     'placement' as Phase,
+        turn: 'host' as Role,
+        board: emptyBoard(),
+        winner: '',
+        phase: 'placement' as Phase,
         createdAt: serverTimestamp(),
         updatedAt: serverTimestamp(),
       });
@@ -93,8 +93,8 @@ export default function GameLobby() {
     if (!uid) return;
     try {
       await updateDoc(doc(db, 'games', gameId), {
-        status:    'playing',
-        guestId:   uid,
+        status: 'playing',
+        guestId: uid,
         updatedAt: serverTimestamp(),
       });
       setActiveGameId(gameId);
@@ -108,91 +108,91 @@ export default function GameLobby() {
   }
 
   const gameModes = [
-    { 
-      id: 'online', 
-      icon: Users, 
-      label: t('create_game'), 
-      desc: 'Play with friends',
-      action: () => createGame('', 'waiting') 
+    {
+      id: 'online',
+      icon: Users,
+      label: t('create_game'),
+      desc: 'Play Online',
+      action: () => createGame('', 'waiting')
     },
-    { 
-      id: 'bot', 
-      icon: Bot, 
-      label: 'vs AI', 
-      desc: 'Challenge the bot',
-      action: () => createGame('bot', 'playing') 
+    {
+      id: 'bot',
+      icon: Bot,
+      label: 'vs AI',
+      desc: 'Challenge Bot',
+      action: () => createGame('bot', 'playing')
     },
-    { 
-      id: 'local', 
-      icon: Smartphone, 
-      label: 'Local', 
+    {
+      id: 'local',
+      icon: Smartphone,
+      label: 'Local',
       desc: 'Pass & Play',
-      action: () => createGame('local', 'playing') 
+      action: () => createGame('local', 'playing')
     },
   ];
 
   return (
-    <div className="flex-1 flex items-center justify-center px-4 py-8">
-      <div className="w-full max-w-md space-y-6 animate-fade-in">
-        
+    <div className="flex-1 flex items-center justify-center px-4 py-6">
+      <div className="w-full max-w-md space-y-5 animate-fade-up">
+
         {/* Game Modes */}
-        <div className="card-elevated p-6 space-y-5">
+        <div className="glass-elevated p-6 space-y-5">
           <div className="text-center">
-            <h2 className="text-lg font-display text-gold-glow">{t('create_game')}</h2>
-            <p className="text-xs text-[#6B6560] mt-1">Choose game mode</p>
+            <h2 className="text-xl font-display text-gradient">{t('create_game')}</h2>
+            <p className="text-xs text-[#6E6A62] mt-1">Choose your battle</p>
           </div>
-          
+
           <div className="grid grid-cols-3 gap-3">
             {gameModes.map(({ id, icon: Icon, label, desc, action }) => (
               <button
                 key={id}
                 onClick={action}
-                className="flex flex-col items-center gap-2 p-4 rounded-xl bg-[#0F0E0C] border border-[#C9A55C]/10 hover:border-[#C9A55C]/30 hover:bg-[#C9A55C]/5 transition-all duration-200 group"
+                className="mode-card"
               >
-                <div className="w-10 h-10 rounded-lg bg-[#C9A55C]/10 flex items-center justify-center group-hover:bg-[#C9A55C]/20 transition-colors">
-                  <Icon size={20} className="text-[#C9A55C]" />
+                <div className="mode-icon">
+                  <Icon size={22} className="text-[#D4A853]" />
                 </div>
-                <span className="text-xs font-medium text-[#F5F0E8]">{label}</span>
-                <span className="text-[10px] text-[#6B6560]">{desc}</span>
+                <span className="text-sm font-medium text-[#FAFAF9]">{label}</span>
+                <span className="text-[10px] text-[#6E6A62]">{desc}</span>
               </button>
             ))}
           </div>
         </div>
 
         {/* Available Games */}
-        <div className="card p-5 space-y-4">
+        <div className="glass p-5 space-y-4">
           <div className="flex items-center justify-between">
-            <h3 className="text-sm font-medium text-[#A8A095]">{t('available_games')}</h3>
-            <span className="status-badge status-playing">
-              <span className="status-dot bg-[#4ADE80]" />
+            <h3 className="text-sm font-medium text-[#B8B5AD]">{t('available_games')}</h3>
+            <div className="badge badge-live">
+              <span className="badge-dot bg-[#5DD27A]" />
               Live
-            </span>
+            </div>
           </div>
-          
+
           {games.length === 0 ? (
-            <div className="py-8 text-center">
-              <div className="w-12 h-12 rounded-xl bg-[#C9A55C]/5 flex items-center justify-center mx-auto mb-3">
-                <Users size={20} className="text-[#6B6560]" />
+            <div className="py-10 text-center">
+              <div className="w-14 h-14 rounded-2xl bg-[#D4A853]/5 flex items-center justify-center mx-auto mb-4">
+                <Users size={24} className="text-[#4A4740]" />
               </div>
-              <p className="text-sm text-[#6B6560]">{t('no_games')}</p>
-              <p className="text-xs text-[#4A4540] mt-1">Create a game to start playing</p>
+              <p className="text-sm text-[#6E6A62]">{t('no_games')}</p>
+              <p className="text-xs text-[#4A4740] mt-1">Create a game to start</p>
             </div>
           ) : (
             <div className="space-y-2">
               {games.map(game => (
                 <div
                   key={game.id}
-                  className="flex items-center justify-between p-3 rounded-xl bg-[#0F0E0C] border border-[#C9A55C]/10 hover:border-[#C9A55C]/20 transition-colors"
+                  className="flex items-center justify-between p-4 rounded-2xl bg-[#12111A] border border-[#D4A853]/8 hover:border-[#D4A853]/20 transition-all"
                 >
                   <div className="flex items-center gap-3">
                     <div className="player-indicator active" />
-                    <span className="text-sm font-medium text-[#F5F0E8]">
+                    <span className="text-sm font-medium text-[#FAFAF9]">
                       Game #{game.id.slice(0, 6)}
                     </span>
                   </div>
                   <button
                     onClick={() => joinGame(game.id)}
-                    className="btn btn-primary !py-2 !px-4 !text-xs"
+                    className="btn btn-primary !py-2.5 !px-5 !text-xs"
                   >
                     {t('join_game')}
                   </button>
@@ -204,32 +204,34 @@ export default function GameLobby() {
 
         {/* Connection Status */}
         <div className="flex items-center justify-center gap-2 py-2">
-          <div className="w-2 h-2 rounded-full bg-[#4ADE80] animate-pulse" />
-          <span className="text-[10px] text-[#6B6560] uppercase tracking-wider">Connected</span>
+          <div className="w-2 h-2 rounded-full bg-[#5DD27A] animate-pulse" />
+          <span className="text-[10px] text-[#4A4740] uppercase tracking-wider font-medium">
+            Connected to Server
+          </span>
         </div>
       </div>
     </div>
   );
 }
 
-// ══════════════════════════════════════════════════════
-//  GameBoard
-// ══════════════════════════════════════════════════════
+// ══════════════════════════════════════════════════════════════
+//  GameBoard - Main Game Interface
+// ══════════════════════════════════════════════════════════════
 function GameBoard({ gameId, onExit }: GameBoardProps) {
-  const { t }   = useTranslation();
-  const uid     = auth.currentUser?.uid;
+  const { t } = useTranslation();
+  const uid = auth.currentUser?.uid;
 
-  const [game, setGame]           = useState<GameDoc | null>(null);
+  const [game, setGame] = useState<GameDoc | null>(null);
   const [selectedIdx, setSelectedIdx] = useState<number | null>(null);
-  const [messages, setMessages]   = useState<ChatMessage[]>([]);
-  const [chatText, setChatText]   = useState('');
-  const [hostName, setHostName]   = useState('Player 1');
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [chatText, setChatText] = useState('');
+  const [hostName, setHostName] = useState('Player 1');
   const [guestName, setGuestName] = useState('Player 2');
-  const [showChat, setShowChat]   = useState(false);
-  const chatRef                   = useRef<HTMLDivElement>(null);
-  const prevGameRef               = useRef<GameDoc | null>(null);
+  const [showChat, setShowChat] = useState(false);
+  const chatRef = useRef<HTMLDivElement>(null);
+  const prevGameRef = useRef<GameDoc | null>(null);
 
-  // ── Subscriptions ──────────────────────────────────
+  // ── Subscriptions ──────────────────────────────────────
   useEffect(() => {
     const unsub = onSnapshot(
       doc(db, 'games', gameId),
@@ -252,24 +254,24 @@ function GameBoard({ gameId, onExit }: GameBoardProps) {
     return () => { unsub(); unsubMsg(); };
   }, [gameId, onExit]);
 
-  // ── Player Names ─────────────────────────────────
+  // ── Player Names ─────────────────────────────────────
   useEffect(() => {
     if (!game?.hostId) return;
     getDoc(doc(db, 'users', game.hostId))
       .then(s => s.exists() && setHostName(s.data().displayName))
-      .catch(() => {});
+      .catch(() => { });
   }, [game?.hostId]);
 
   useEffect(() => {
     if (!game?.guestId) return;
-    if (game.guestId === 'bot')   { setGuestName('Computer');         return; }
+    if (game.guestId === 'bot') { setGuestName('Computer'); return; }
     if (game.guestId === 'local') { setGuestName('Player 2'); return; }
     getDoc(doc(db, 'users', game.guestId))
       .then(s => s.exists() && setGuestName(s.data().displayName))
-      .catch(() => {});
+      .catch(() => { });
   }, [game?.guestId]);
 
-  // ── Sounds ────────────────────────────────────────
+  // ── Sounds ────────────────────────────────────────────
   useEffect(() => {
     if (!game || !prevGameRef.current) { prevGameRef.current = game; return; }
     const prev = prevGameRef.current;
@@ -280,23 +282,23 @@ function GameBoard({ gameId, onExit }: GameBoardProps) {
     } else if (prev.turn !== game.turn && prev.board && game.board) {
       const prevCount = prev.board.filter(c => c !== '').length;
       const currCount = game.board.filter(c => c !== '').length;
-      if      (currCount > prevCount) playSound('place');
+      if (currCount > prevCount) playSound('place');
       else if (currCount < prevCount) playSound('capture');
-      else                            playSound('move');
+      else playSound('move');
     }
 
     prevGameRef.current = game;
   }, [game, uid]);
 
-  // ── Derived State ────────────────────────────
-  const isHost    = uid === game?.hostId;
-  const isGuest   = uid === game?.guestId;
-  const isLocal   = game?.guestId === 'local';
-  const isMyTurn  = isLocal
-    || (isHost  && game?.turn === 'host')
+  // ── Derived State ────────────────────────────────
+  const isHost = uid === game?.hostId;
+  const isGuest = uid === game?.guestId;
+  const isLocal = game?.guestId === 'local';
+  const isMyTurn = isLocal
+    || (isHost && game?.turn === 'host')
     || (isGuest && game?.turn === 'guest');
 
-  // ── commitUpdate ──────────
+  // ── commitUpdate ──────────────────────────────────────
   const commitUpdate = useCallback(async (updates: Partial<GameDoc>) => {
     const full = { ...updates, updatedAt: serverTimestamp() };
     setGame(prev => prev ? { ...prev, ...updates } : prev);
@@ -307,7 +309,7 @@ function GameBoard({ gameId, onExit }: GameBoardProps) {
     }
   }, [gameId]);
 
-  // ── commitTransaction ───────────
+  // ── commitTransaction ─────────────────────────────────
   const commitTransaction = useCallback(async (updates: Partial<GameDoc>) => {
     try {
       await runTransaction(db, async (tx) => {
@@ -325,11 +327,11 @@ function GameBoard({ gameId, onExit }: GameBoardProps) {
     }
   }, [gameId, isHost, isLocal]);
 
-  // ── Bot Effect ─────────────────────────────────────
+  // ── Bot Effect ─────────────────────────────────────────
   useEffect(() => {
     if (!game || game.status !== 'playing') return;
-    if (game.guestId !== 'bot')             return;
-    if (game.turn !== 'guest' || !isHost)   return;
+    if (game.guestId !== 'bot') return;
+    if (game.turn !== 'guest' || !isHost) return;
 
     const timer = setTimeout(async () => {
       const botPiece: Piece = '2';
@@ -339,13 +341,13 @@ function GameBoard({ gameId, onExit }: GameBoardProps) {
       const placed = countPieces(game.board, '1') + countPieces(game.board, '2');
 
       if (game.phase === 'placement') {
-        const newBoard  = [...game.board] as Board;
+        const newBoard = [...game.board] as Board;
         newBoard[move.toIdx] = botPiece;
-        const next   = placed + 1;
+        const next = placed + 1;
         const isLast = next === MAX_PIECES;
         await commitUpdate({
           board: newBoard,
-          turn:  isLast ? 'host' : getNextTurnPlacement(next),
+          turn: isLast ? 'host' : getNextTurnPlacement(next),
           phase: isLast ? 'movement' : 'placement',
         });
       } else {
@@ -354,8 +356,8 @@ function GameBoard({ gameId, onExit }: GameBoardProps) {
         );
         const winner = checkWinner(newBoard, 'guest');
         await commitUpdate({
-          board:  newBoard,
-          turn:   canContinue ? 'guest' : 'host',
+          board: newBoard,
+          turn: canContinue ? 'guest' : 'host',
           status: winner ? 'finished' : 'playing',
           winner: winner || '',
         });
@@ -365,7 +367,7 @@ function GameBoard({ gameId, onExit }: GameBoardProps) {
     return () => clearTimeout(timer);
   }, [game?.turn, game?.status, game?.phase, isHost, commitUpdate]);
 
-  // ── handleCellClick ────────────────────────────────
+  // ── handleCellClick ────────────────────────────────────
   const handleCellClick = async (idx: number) => {
     if (!game || !isMyTurn || game.status !== 'playing') return;
 
@@ -381,12 +383,12 @@ function GameBoard({ gameId, onExit }: GameBoardProps) {
       if (idx === CENTER_IDX || game.board[idx] !== '') return;
 
       const newBoard = [...game.board] as Board;
-      newBoard[idx]  = myPiece;
-      const next     = placed + 1;
-      const isLast   = next === MAX_PIECES;
-      const updates  = {
+      newBoard[idx] = myPiece;
+      const next = placed + 1;
+      const isLast = next === MAX_PIECES;
+      const updates = {
         board: newBoard,
-        turn:  (isLast ? 'host' : getNextTurnPlacement(next)) as Role,
+        turn: (isLast ? 'host' : getNextTurnPlacement(next)) as Role,
         phase: (isLast ? 'movement' : 'placement') as Phase,
       };
 
@@ -417,8 +419,8 @@ function GameBoard({ gameId, onExit }: GameBoardProps) {
     setSelectedIdx(null);
 
     const updates = {
-      board:  newBoard,
-      turn:   (canContinue ? game.turn : (game.turn === 'host' ? 'guest' : 'host')) as Role,
+      board: newBoard,
+      turn: (canContinue ? game.turn : (game.turn === 'host' ? 'guest' : 'host')) as Role,
       status: (winner ? 'finished' : 'playing') as GameDoc['status'],
       winner: (winner || '') as Role | '',
     };
@@ -428,23 +430,23 @@ function GameBoard({ gameId, onExit }: GameBoardProps) {
       : await commitUpdate(updates);
   };
 
-  // ── Play Again ─────────────────────────────────────
+  // ── Play Again ─────────────────────────────────────────
   const handlePlayAgain = () => commitUpdate({
     status: 'playing',
-    turn:   'host',
-    board:  emptyBoard(),
+    turn: 'host',
+    board: emptyBoard(),
     winner: '',
-    phase:  'placement',
+    phase: 'placement',
   });
 
-  // ── Chat ───────────────────────────────────────────
+  // ── Chat ───────────────────────────────────────────────
   const sendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!chatText.trim() || !uid) return;
     try {
       await setDoc(doc(collection(db, `games/${gameId}/messages`)), {
-        senderId:  uid,
-        text:      chatText.trim(),
+        senderId: uid,
+        text: chatText.trim(),
         createdAt: serverTimestamp(),
       });
       setChatText('');
@@ -453,11 +455,11 @@ function GameBoard({ gameId, onExit }: GameBoardProps) {
     }
   };
 
-  // ── renderCell ─────────────────────────────────────
+  // ── renderCell ─────────────────────────────────────────
   const renderCell = (idx: number) => {
-    const content  = game!.board[idx];
+    const content = game!.board[idx];
     const isSelected = selectedIdx === idx;
-    const isEven  = (Math.floor(idx / 7) + (idx % 7)) % 2 === 0;
+    const isEven = (Math.floor(idx / 7) + (idx % 7)) % 2 === 0;
     const isValidTarget =
       selectedIdx !== null &&
       game!.phase === 'movement' &&
@@ -473,22 +475,28 @@ function GameBoard({ gameId, onExit }: GameBoardProps) {
           isValidTarget && 'cell-valid'
         )}
       >
-        {content === '1' && (
-          <motion.div
-            initial={{ scale: 0, opacity: 0 }}
-            animate={{ scale: isSelected ? 1.1 : 1, opacity: 1 }}
-            transition={{ type: 'spring', stiffness: 400, damping: 25 }}
-            className={cn('piece piece-rock', isSelected && 'piece-selected')}
-          />
-        )}
-        {content === '2' && (
-          <motion.div
-            initial={{ scale: 0, opacity: 0 }}
-            animate={{ scale: isSelected ? 1.1 : 1, opacity: 1 }}
-            transition={{ type: 'spring', stiffness: 400, damping: 25 }}
-            className={cn('piece piece-seed', isSelected && 'piece-selected')}
-          />
-        )}
+        <AnimatePresence mode="wait">
+          {content === '1' && (
+            <motion.div
+              key={`piece-1-${idx}`}
+              initial={{ scale: 0, opacity: 0 }}
+              animate={{ scale: isSelected ? 1.15 : 1, opacity: 1 }}
+              exit={{ scale: 0, opacity: 0 }}
+              transition={{ type: 'spring', stiffness: 400, damping: 25 }}
+              className={cn('piece piece-rock', isSelected && 'piece-selected')}
+            />
+          )}
+          {content === '2' && (
+            <motion.div
+              key={`piece-2-${idx}`}
+              initial={{ scale: 0, opacity: 0 }}
+              animate={{ scale: isSelected ? 1.15 : 1, opacity: 1 }}
+              exit={{ scale: 0, opacity: 0 }}
+              transition={{ type: 'spring', stiffness: 400, damping: 25 }}
+              className={cn('piece piece-seed', isSelected && 'piece-selected')}
+            />
+          )}
+        </AnimatePresence>
       </div>
     );
   };
@@ -496,7 +504,7 @@ function GameBoard({ gameId, onExit }: GameBoardProps) {
   if (!game) {
     return (
       <div className="flex-1 flex items-center justify-center">
-        <div className="w-8 h-8 border-2 border-[#C9A55C] border-t-transparent rounded-full animate-spin" />
+        <div className="w-10 h-10 border-2 border-[#D4A853] border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
@@ -504,82 +512,99 @@ function GameBoard({ gameId, onExit }: GameBoardProps) {
   const myRole: Role = isHost ? 'host' : 'guest';
 
   return (
-    <div className="flex-1 flex flex-col items-center px-4 py-4 sm:py-6 max-w-md mx-auto w-full">
-      
+    <div className="flex-1 flex flex-col items-center px-4 py-4 max-w-md mx-auto w-full animate-fade-up">
+
       {/* Header */}
       <div className="w-full flex items-center justify-between mb-4">
-        <button onClick={onExit} className="btn btn-ghost !p-2.5">
-          <ArrowLeft size={18} />
+        <button onClick={onExit} className="btn btn-ghost btn-icon !w-11 !h-11">
+          <ArrowLeft size={20} />
         </button>
-        <div className="text-center">
-          <h2 className="text-sm font-display text-gold">{t('app_name')}</h2>
-          <p className="text-[10px] text-[#6B6560] capitalize">
+        <div className="text-center flex-1">
+          <h2 className="text-base font-display text-gradient">{t('app_name')}</h2>
+          <p className="text-[10px] text-[#6E6A62] capitalize mt-0.5">
             {game.phase === 'placement' ? t('phase_placement') : t('phase_movement')}
           </p>
         </div>
-        <div className="w-10" /> {/* Spacer for centering */}
+        <button 
+          onClick={() => setShowChat(!showChat)} 
+          className={cn(
+            "btn btn-ghost btn-icon !w-11 !h-11 relative",
+            showChat && "!bg-[#D4A853]/15 !border-[#D4A853]/30"
+          )}
+        >
+          <MessageCircle size={20} />
+          {messages.length > 0 && !showChat && (
+            <span className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-[#D4A853] text-[#08070A] text-[10px] font-bold flex items-center justify-center">
+              {messages.length > 9 ? '9+' : messages.length}
+            </span>
+          )}
+        </button>
       </div>
 
       {/* Players Status */}
-      <div className="w-full card-game p-4 mb-4 space-y-3">
-        <div className="flex items-center justify-between">
+      <div className="w-full glass-subtle p-4 mb-4 space-y-3">
+        <div className="flex items-center justify-between gap-3">
           {/* Host */}
           <div className={cn(
-            'player-badge flex-1 max-w-[140px]',
+            'player-card flex-1',
             game.turn === 'host' && 'active'
           )}>
             <div className={cn('player-indicator', game.turn === 'host' && 'active')} />
             <div className="min-w-0 flex-1">
-              <p className="text-xs font-medium text-[#F5F0E8] truncate">{hostName}</p>
-              <p className="text-[9px] text-[#6B6560]">{t('rocks')}</p>
+              <p className="text-sm font-medium text-[#FAFAF9] truncate">{hostName}</p>
+              <p className="text-[10px] text-[#6E6A62]">{t('rocks')}</p>
             </div>
           </div>
 
-          <span className="text-xs font-medium text-[#C9A55C] px-3">VS</span>
+          <span className="text-xs font-bold text-[#D4A853] px-2">VS</span>
 
           {/* Guest */}
           <div className={cn(
-            'player-badge flex-1 max-w-[140px] flex-row-reverse text-right',
+            'player-card flex-1 flex-row-reverse text-right',
             game.turn === 'guest' && 'active'
           )}>
             <div className={cn('player-indicator', game.turn === 'guest' && 'active')} />
             <div className="min-w-0 flex-1">
-              <p className="text-xs font-medium text-[#F5F0E8] truncate">
+              <p className="text-sm font-medium text-[#FAFAF9] truncate">
                 {game.guestId ? guestName : 'Waiting...'}
               </p>
-              <p className="text-[9px] text-[#6B6560]">{t('date_pits')}</p>
+              <p className="text-[10px] text-[#6E6A62]">{t('date_pits')}</p>
             </div>
           </div>
         </div>
 
         {/* Game Status */}
-        <div className="text-center py-2">
+        <div className="text-center py-1">
           {game.status === 'waiting' && (
-            <div className="status-badge status-waiting mx-auto">
-              <span className="status-dot bg-[#C9A55C]" />
+            <div className="badge badge-waiting mx-auto">
+              <span className="badge-dot bg-[#D4A853]" />
               {t('waiting_for_opponent')}
             </div>
           )}
           {game.status === 'playing' && (
             <p className={cn(
-              'text-sm font-medium',
-              isMyTurn ? 'text-[#C9A55C]' : 'text-[#6B6560]'
+              'text-sm font-medium transition-colors',
+              isMyTurn ? 'text-glow' : 'text-[#6E6A62]'
             )}>
               {isMyTurn ? t('your_turn') : t('opponent_turn')}
             </p>
           )}
           {game.status === 'finished' && (
-            <div className="space-y-3">
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              className="space-y-3 py-2"
+            >
               <p className={cn(
-                'text-xl font-display font-bold',
-                game.winner === myRole ? 'text-[#C9A55C]' : 'text-[#EF4444]'
+                'text-2xl font-display font-bold',
+                game.winner === myRole ? 'text-gradient' : 'text-[#F25252]'
               )}>
                 {game.winner === myRole ? t('you_win') : t('you_lose')}
               </p>
               <button onClick={handlePlayAgain} className="btn btn-primary">
                 Play Again
               </button>
-            </div>
+            </motion.div>
           )}
         </div>
       </div>
@@ -587,15 +612,20 @@ function GameBoard({ gameId, onExit }: GameBoardProps) {
       {/* Board */}
       <div className="w-full flex justify-center mb-4">
         <div className="w-full max-w-[340px]">
-          <div className="board-container">
-            <div className="board-grid">
-              {Array(49).fill(null).map((_, i) => renderCell(i))}
+          <div className="board-wrapper">
+            <div className="board-container">
+              <div className="board-grid">
+                {Array(49).fill(null).map((_, i) => renderCell(i))}
+              </div>
             </div>
           </div>
-          <div className="flex justify-between mt-3 px-1 text-[10px] text-[#6B6560]">
-            <span>7 x 7</span>
-            <span className={isMyTurn ? 'text-[#C9A55C]' : ''}>
-              {isMyTurn ? 'Your Move' : 'Waiting'}
+          <div className="flex justify-between mt-3 px-1 text-[10px] text-[#6E6A62]">
+            <span className="font-medium">7 x 7 Board</span>
+            <span className={cn(
+              'font-medium transition-colors',
+              isMyTurn ? 'text-[#D4A853]' : ''
+            )}>
+              {isMyTurn ? 'Your Move' : 'Waiting...'}
             </span>
           </div>
         </div>
@@ -603,69 +633,81 @@ function GameBoard({ gameId, onExit }: GameBoardProps) {
 
       {/* Legend */}
       <div className="flex justify-center gap-8 mb-4">
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2.5">
           <div className="w-5 h-5 piece piece-rock" />
-          <span className="text-xs text-[#A8A095]">{t('rocks')}</span>
+          <span className="text-xs text-[#B8B5AD]">{t('rocks')}</span>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2.5">
           <div className="w-3.5 h-3.5 piece piece-seed" />
-          <span className="text-xs text-[#A8A095]">{t('date_pits')}</span>
+          <span className="text-xs text-[#B8B5AD]">{t('date_pits')}</span>
         </div>
       </div>
 
-      {/* Chat Section */}
-      <div className="w-full chat-container flex flex-col flex-1 min-h-[200px] max-h-[280px]">
-        <div className="flex items-center justify-between px-4 py-3 border-b border-[#C9A55C]/10">
-          <h3 className="text-xs font-medium text-[#A8A095]">Chat</h3>
-          <span className="text-[10px] text-[#6B6560]">{messages.length} messages</span>
-        </div>
-        
-        <div ref={chatRef} className="flex-1 overflow-y-auto p-4 space-y-3">
-          {messages.length === 0 ? (
-            <p className="text-center text-xs text-[#6B6560] py-8">
-              No messages yet
-            </p>
-          ) : (
-            messages.map(msg => {
-              const isMine = msg.senderId === uid;
-              const time = msg.createdAt?.toDate
-                ? msg.createdAt.toDate().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-                : '';
-              return (
-                <div key={msg.id} className={cn('flex flex-col', isMine ? 'items-end' : 'items-start')}>
-                  <div className={cn(
-                    'chat-message',
-                    isMine ? 'chat-message-mine' : 'chat-message-other'
-                  )}>
-                    {msg.text}
-                  </div>
-                  {time && (
-                    <span className="text-[9px] text-[#6B6560] mt-1 px-1">{time}</span>
-                  )}
-                </div>
-              );
-            })
-          )}
-        </div>
-
-        <form onSubmit={sendMessage} className="p-3 border-t border-[#C9A55C]/10 flex gap-2">
-          <input
-            type="text"
-            value={chatText}
-            onChange={e => setChatText(e.target.value)}
-            disabled={game.status === 'waiting'}
-            placeholder={game.status === 'waiting' ? 'Waiting...' : 'Type a message...'}
-            className="chat-input flex-1"
-          />
-          <button
-            type="submit"
-            disabled={!chatText.trim() || game.status === 'waiting'}
-            className="btn btn-primary !p-3"
+      {/* Chat Panel */}
+      <AnimatePresence>
+        {showChat && (
+          <motion.div
+            initial={{ opacity: 0, y: 20, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 20, scale: 0.95 }}
+            transition={{ type: 'spring', stiffness: 400, damping: 30 }}
+            className="w-full chat-container flex flex-col h-64"
           >
-            <Send size={16} />
-          </button>
-        </form>
-      </div>
+            <div className="flex items-center justify-between px-4 py-3 border-b border-[#D4A853]/10">
+              <h3 className="text-xs font-medium text-[#B8B5AD]">Game Chat</h3>
+              <button onClick={() => setShowChat(false)} className="text-[#6E6A62] hover:text-[#FAFAF9] transition-colors">
+                <X size={16} />
+              </button>
+            </div>
+
+            <div ref={chatRef} className="flex-1 overflow-y-auto p-4 space-y-3">
+              {messages.length === 0 ? (
+                <p className="text-center text-xs text-[#4A4740] py-8">
+                  No messages yet. Say hello!
+                </p>
+              ) : (
+                messages.map(msg => {
+                  const isMine = msg.senderId === uid;
+                  const time = msg.createdAt?.toDate
+                    ? msg.createdAt.toDate().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+                    : '';
+                  return (
+                    <div key={msg.id} className={cn('flex flex-col', isMine ? 'items-end' : 'items-start')}>
+                      <div className={cn(
+                        'chat-bubble',
+                        isMine ? 'chat-bubble-mine' : 'chat-bubble-other'
+                      )}>
+                        {msg.text}
+                      </div>
+                      {time && (
+                        <span className="text-[9px] text-[#4A4740] mt-1 px-1">{time}</span>
+                      )}
+                    </div>
+                  );
+                })
+              )}
+            </div>
+
+            <form onSubmit={sendMessage} className="p-3 border-t border-[#D4A853]/10 flex gap-2">
+              <input
+                type="text"
+                value={chatText}
+                onChange={e => setChatText(e.target.value)}
+                disabled={game.status === 'waiting'}
+                placeholder={game.status === 'waiting' ? 'Waiting for opponent...' : 'Type a message...'}
+                className="chat-input flex-1"
+              />
+              <button
+                type="submit"
+                disabled={!chatText.trim() || game.status === 'waiting'}
+                className="btn btn-primary !p-3"
+              >
+                <Send size={16} />
+              </button>
+            </form>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

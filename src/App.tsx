@@ -5,22 +5,22 @@ import { onAuthStateChanged, signOut, User } from 'firebase/auth';
 import { doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore';
 import Auth from './components/Auth';
 import GameLobby from './components/Game';
-import { LogOut, Globe, ChevronDown } from 'lucide-react';
+import { LogOut, ChevronDown, Sparkles } from 'lucide-react';
 import './i18n';
 
 type Lang = 'ar' | 'fr' | 'en' | 'tzm';
 
-const LANGS: { code: Lang; label: string }[] = [
-  { code: 'ar',  label: 'العربية'      },
-  { code: 'tzm', label: 'ⵜⴰⵎⴰⵣⵉⵖⵜ' },
-  { code: 'fr',  label: 'Français'     },
-  { code: 'en',  label: 'English'      },
+const LANGS: { code: Lang; label: string; native: string }[] = [
+  { code: 'ar',  label: 'Arabic',   native: 'العربية' },
+  { code: 'tzm', label: 'Amazigh',  native: 'ⵜⴰⵎⴰⵣⵉⵖⵜ' },
+  { code: 'fr',  label: 'French',   native: 'Français' },
+  { code: 'en',  label: 'English',  native: 'English' },
 ];
 
 export default function App() {
   const { t, i18n } = useTranslation();
-  const [user, setUser]               = useState<User | null>(null);
-  const [loading, setLoading]         = useState(true);
+  const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
   const [langSelected, setLangSelected] = useState(
     () => !!localStorage.getItem('langSelected')
   );
@@ -36,7 +36,7 @@ export default function App() {
 
   const ensureUserProfile = async (u: User) => {
     try {
-      const ref  = doc(db, 'users', u.uid);
+      const ref = doc(db, 'users', u.uid);
       const snap = await getDoc(ref);
       if (snap.exists()) return;
       const displayName = u.email
@@ -45,10 +45,10 @@ export default function App() {
           ? `Player_${u.phoneNumber.slice(-4)}`
           : 'Player';
       await setDoc(ref, {
-        uid:         u.uid,
-        email:       u.email || u.phoneNumber || '',
+        uid: u.uid,
+        email: u.email || u.phoneNumber || '',
         displayName,
-        createdAt:   serverTimestamp(),
+        createdAt: serverTimestamp(),
       });
     } catch (e: any) {
       if (!e.message?.toLowerCase().includes('offline')) {
@@ -63,69 +63,90 @@ export default function App() {
     setLangSelected(true);
   };
 
-  // Language Selection Screen
+  // ══════════════════════════════════════════════════════
+  //  Language Selection Screen
+  // ══════════════════════════════════════════════════════
   if (!langSelected) {
     return (
-      <div className="min-h-screen flex items-center justify-center p-6 bg-[#0A0908]">
-        <div className="card-elevated p-8 w-full max-w-sm text-center space-y-8 animate-scale-in">
-          {/* Logo */}
-          <div className="flex flex-col items-center gap-4">
-            <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-[#C9A55C] to-[#8B7340] flex items-center justify-center shadow-lg">
-              <span className="text-4xl font-display text-[#0A0908]">D</span>
+      <div className="min-h-screen flex items-center justify-center p-6">
+        <div className="glass-elevated p-8 w-full max-w-sm animate-scale-in">
+          {/* Logo & Branding */}
+          <div className="flex flex-col items-center gap-5 mb-8">
+            <div className="relative">
+              <div className="w-24 h-24 rounded-3xl bg-gradient-to-br from-[#D4A853] via-[#B8924A] to-[#8B6D35] flex items-center justify-center shadow-lg">
+                <span className="text-5xl font-display text-[#08070A]">K</span>
+              </div>
+              <div className="absolute -top-1 -right-1 w-6 h-6 rounded-full bg-[#D4A853] flex items-center justify-center shadow-md">
+                <Sparkles size={12} className="text-[#08070A]" />
+              </div>
             </div>
-            <div>
-              <h1 className="text-2xl font-display text-gold-glow">Khargba</h1>
-              <p className="text-sm text-[#6B6560] mt-1">Desert Strategy Game</p>
+            <div className="text-center">
+              <h1 className="text-3xl font-display text-gradient">Khargba</h1>
+              <p className="text-sm text-[#6E6A62] mt-2">Desert Strategy Game</p>
             </div>
           </div>
           
-          {/* Language Options */}
-          <div className="space-y-3">
-            <p className="text-xs text-[#6B6560] uppercase tracking-wider">Select Language</p>
+          {/* Language Selection */}
+          <div className="space-y-4">
+            <p className="text-xs text-center text-[#6E6A62] uppercase tracking-widest">
+              Select Your Language
+            </p>
             <div className="grid grid-cols-2 gap-3">
-              {LANGS.map(({ code, label }) => (
+              {LANGS.map(({ code, native }) => (
                 <button
                   key={code}
                   onClick={() => selectLang(code)}
-                  className="btn btn-ghost py-4"
+                  className="btn btn-ghost py-4 flex-col gap-1"
                 >
-                  {label}
+                  <span className="text-base">{native}</span>
                 </button>
               ))}
             </div>
           </div>
+          
+          {/* Footer Note */}
+          <p className="text-[10px] text-center text-[#4A4740] mt-8">
+            A traditional Saharan board game
+          </p>
         </div>
       </div>
     );
   }
 
-  // Loading Screen
+  // ══════════════════════════════════════════════════════
+  //  Loading Screen
+  // ══════════════════════════════════════════════════════
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#0A0908]">
-        <div className="flex flex-col items-center gap-4">
-          <div className="w-12 h-12 rounded-xl bg-[#C9A55C]/20 flex items-center justify-center">
-            <div className="w-6 h-6 border-2 border-[#C9A55C] border-t-transparent rounded-full animate-spin" />
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="flex flex-col items-center gap-5">
+          <div className="relative">
+            <div className="w-16 h-16 rounded-2xl bg-[#D4A853]/10 flex items-center justify-center">
+              <div className="w-8 h-8 border-2 border-[#D4A853] border-t-transparent rounded-full animate-spin" />
+            </div>
           </div>
-          <p className="text-[#6B6560] text-sm">{t('loading')}</p>
+          <p className="text-[#6E6A62] text-sm">{t('loading')}</p>
         </div>
       </div>
     );
   }
 
+  // ══════════════════════════════════════════════════════
+  //  Main App Layout
+  // ══════════════════════════════════════════════════════
   return (
-    <div className="min-h-screen flex flex-col bg-[#0A0908]">
+    <div className="min-h-screen flex flex-col">
       {/* Header */}
-      <header className="sticky top-0 z-50 backdrop-blur-xl bg-[#0A0908]/90 border-b border-[#C9A55C]/10">
+      <header className="sticky top-0 z-50 backdrop-blur-xl bg-[#08070A]/80 border-b border-[#D4A853]/8">
         <div className="flex justify-between items-center px-4 sm:px-6 py-3 max-w-2xl mx-auto">
           {/* Logo */}
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#C9A55C] to-[#8B7340] flex items-center justify-center shadow-md">
-              <span className="text-xl font-display text-[#0A0908] font-bold">D</span>
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#D4A853] to-[#8B6D35] flex items-center justify-center shadow-md">
+              <span className="text-lg font-display text-[#08070A] font-bold">K</span>
             </div>
             <div className="hidden sm:block">
-              <h1 className="text-base font-display text-gold">Khargba</h1>
-              <p className="text-[10px] text-[#6B6560]">Desert Strategy</p>
+              <h1 className="text-sm font-display text-gradient">Khargba</h1>
+              <p className="text-[10px] text-[#6E6A62]">Desert Strategy</p>
             </div>
           </div>
           
@@ -136,22 +157,22 @@ export default function App() {
               <select
                 value={i18n.language}
                 onChange={e => i18n.changeLanguage(e.target.value)}
-                className="appearance-none bg-[#141210] text-[#C9A55C] text-xs px-3 py-2 pr-8 rounded-lg border border-[#C9A55C]/20 outline-none cursor-pointer"
+                className="appearance-none bg-[#1A1824] text-[#D4A853] text-xs font-medium px-3 py-2.5 pr-8 rounded-xl border border-[#D4A853]/15 outline-none cursor-pointer transition-colors hover:border-[#D4A853]/30"
               >
-                {LANGS.map(({ code, label }) => (
-                  <option key={code} value={code} className="bg-[#0A0908]">
-                    {label}
+                {LANGS.map(({ code, native }) => (
+                  <option key={code} value={code} className="bg-[#0C0B0F]">
+                    {native}
                   </option>
                 ))}
               </select>
-              <ChevronDown size={14} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[#C9A55C]/60 pointer-events-none" />
+              <ChevronDown size={14} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[#D4A853]/50 pointer-events-none" />
             </div>
             
             {/* Logout */}
             {user && (
               <button
                 onClick={() => signOut(auth)}
-                className="btn btn-ghost !px-3 !py-2"
+                className="btn btn-ghost !px-3 !py-2.5"
                 title={t('logout')}
               >
                 <LogOut size={16} />
@@ -168,9 +189,9 @@ export default function App() {
       </main>
 
       {/* Footer */}
-      <footer className="py-4 text-center border-t border-[#C9A55C]/5">
-        <p className="text-[10px] text-[#6B6560] tracking-wide">
-          Khargba - Desert Dama Game
+      <footer className="py-4 text-center border-t border-[#D4A853]/5">
+        <p className="text-[10px] text-[#4A4740] tracking-wider">
+          Khargba - A Saharan Legacy
         </p>
       </footer>
     </div>
