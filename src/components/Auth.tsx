@@ -215,35 +215,34 @@ export default function Auth() {
   };
 
   const inputClass =
-    'w-full px-4 py-3 bg-[#12100E] border border-[#4a3a2a] rounded-[4px] ' +
-    'text-sm text-[#E6D5B8] placeholder:text-[#E6D5B8]/40 ' +
-    'focus:outline-none focus:border-[#D4AF37] focus:ring-1 focus:ring-[#D4AF37] ' +
-    'disabled:opacity-50 disabled:cursor-not-allowed ' +
-    'min-h-[44px]';
+    'w-full px-5 py-4 text-lg font-modern bg-[rgba(212,175,55,0.05)] border-2 border-[rgba(212,175,55,0.25)] ' +
+    'text-[#E6D5B8] placeholder-[#8B7355] rounded-lg outline-none transition-all ' +
+    'focus:border-[#D4AF37] focus:bg-[rgba(212,175,55,0.1)] focus:shadow-[0_0_15px_rgba(212,175,55,0.2)] ' +
+    'disabled:opacity-50 disabled:cursor-not-allowed min-h-[56px]';
 
   const btnPrimary =
-    'w-full py-3 luxury-btn-primary rounded-[4px] text-xs font-display ' +
-    'font-bold uppercase tracking-widest disabled:opacity-50 ' +
-    'disabled:cursor-not-allowed transition-all min-h-[44px]';
+    'w-full py-4 luxury-btn-primary rounded-lg text-lg font-modern ' +
+    'font-bold uppercase tracking-wider disabled:opacity-50 ' +
+    'disabled:cursor-not-allowed transition-all min-h-[56px]';
 
   const btnSecondary =
-    'w-full py-3 luxury-btn rounded-[4px] text-xs font-display ' +
-    'font-bold uppercase tracking-widest transition-all min-h-[44px]';
+    'w-full py-4 luxury-btn rounded-lg text-lg font-modern ' +
+    'font-bold uppercase tracking-wider transition-all min-h-[56px]';
 
   // ── Choose Mode Screen ─────────────────────────────────
   if (mode === 'choose') {
     return (
-      <div className="w-full max-w-sm mx-auto mt-4 sm:mt-8 space-y-3 sm:space-y-4 font-serif px-2 sm:px-0">
-        <div className="luxury-panel p-4 sm:p-8 text-center space-y-4 sm:space-y-6">
-          <div className="space-y-1">
-            <h2 className="text-base sm:text-lg font-display font-bold uppercase tracking-[0.2em] luxury-text-gold">
-              الدخول إلى خربڤة
+      <div className="w-full max-w-2xl mx-auto space-y-6 font-modern px-4 sm:px-0">
+        <div className="luxury-panel p-8 sm:p-12 text-center space-y-10">
+          <div className="space-y-4">
+            <h2 className="text-4xl sm:text-5xl font-display-bold uppercase tracking-wider luxury-text-gold">
+              أدخل إلى حسابك
             </h2>
-            <p className="text-[8px] sm:text-[10px] uppercase tracking-[0.25em] text-[#E6D5B8] opacity-50 font-display">
-              اختر طريقة التسجيل
+            <p className="text-lg sm:text-xl font-modern text-[#E6D5B8] opacity-70">
+              اختر طريقة التسجيل المفضلة لديك
             </p>
           </div>
-          <div className="flex flex-col gap-2 sm:gap-3">
+          <div className="flex flex-col gap-6 sm:gap-5">
             <button 
               onClick={() => setMode('phone')} 
               className={btnPrimary}
@@ -267,19 +266,19 @@ export default function Auth() {
   // ── Phone Auth Screen ──────────────────────────────────
   if (mode === 'phone') {
     return (
-      <div className="w-full max-w-sm mx-auto mt-4 sm:mt-8 font-serif px-2 sm:px-0">
+      <div className="w-full max-w-2xl mx-auto font-modern px-4 sm:px-0">
         <div id="recaptcha-container" />
-        <div className="luxury-panel p-4 sm:p-8 space-y-3 sm:space-y-5">
+        <div className="luxury-panel p-8 sm:p-12 space-y-8">
           <button
             onClick={() => { setMode('choose'); resetForm(); }}
-            className="text-[8px] sm:text-[10px] uppercase tracking-widest text-[#D4AF37] opacity-60 hover:opacity-100 font-display transition-opacity"
+            className="text-lg font-modern text-[#D4AF37] opacity-70 hover:opacity-100 transition-opacity font-medium tracking-wider"
             aria-label="العودة للخلف"
           >
-            ← رجوع
+            ← العودة
           </button>
 
-          <h2 className="text-sm sm:text-base font-display font-bold uppercase tracking-[0.2em] luxury-text-gold text-center">
-            {step === 'input' ? 'رقم الهاتف' : 'رمز التحقق'}
+          <h2 className="text-3xl sm:text-4xl font-display-bold uppercase tracking-wider luxury-text-gold text-center">
+            {step === 'input' ? 'رقم الهاتف' : 'التحقق'}
           </h2>
 
           {step === 'input' ? (
@@ -349,17 +348,17 @@ export default function Auth() {
 
   // ── Email Auth Screen ──────────────────────────────────
   return (
-    <div className="w-full max-w-sm mx-auto mt-4 sm:mt-8 font-serif px-2 sm:px-0">
-      <div className="luxury-panel p-4 sm:p-8 space-y-3 sm:space-y-5">
+    <div className="w-full max-w-2xl mx-auto font-modern px-4 sm:px-0">
+      <div className="luxury-panel p-8 sm:p-12 space-y-8">
         <button
           onClick={() => { setMode('choose'); resetForm(); }}
-          className="text-[8px] sm:text-[10px] uppercase tracking-widest text-[#D4AF37] opacity-60 hover:opacity-100 font-display transition-opacity"
+          className="text-lg font-modern text-[#D4AF37] opacity-70 hover:opacity-100 transition-opacity font-medium tracking-wider"
           aria-label="العودة للخلف"
         >
-          ← رجوع
+          ← العودة
         </button>
 
-        <h2 className="text-sm sm:text-base font-display font-bold uppercase tracking-[0.2em] luxury-text-gold text-center">
+        <h2 className="text-3xl sm:text-4xl font-display-bold uppercase tracking-wider luxury-text-gold text-center">
           {isRegister ? 'إنشاء حساب' : 'تسجيل الدخول'}
         </h2>
 
@@ -397,14 +396,14 @@ export default function Auth() {
 
         <button
           onClick={() => { setIsRegister(r => !r); setError(''); }}
-          className="text-[8px] sm:text-[10px] text-center w-full uppercase tracking-widest text-[#D4AF37] opacity-60 hover:opacity-100 font-display transition-opacity"
+          className="text-lg text-center w-full font-modern text-[#D4AF37] opacity-70 hover:opacity-100 transition-opacity font-medium tracking-wider"
         >
           {isRegister ? 'لدي حساب — دخول' : 'حساب جديد — تسجيل'}
         </button>
 
         {error && (
-          <div className="bg-red-900/20 border border-red-500/30 rounded px-2 sm:px-3 py-2">
-            <p className="text-red-400 text-xs text-center font-display tracking-wide">
+          <div className="bg-red-900/20 border-2 border-red-500/40 rounded-lg px-5 py-4">
+            <p className="text-red-300 text-lg text-center font-modern tracking-wide">
               {error}
             </p>
           </div>

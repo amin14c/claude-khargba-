@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=EB+Garamond:ital,wght@0,400;0,600;1,400&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Playfair+Display:wght@600;700;800;900&family=Cinzel:wght@400;600;700;900&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -41,7 +41,9 @@ body {
 }
 
 /* ── Typography ────────────────────────────────────── */
-.font-display { font-family: 'Cinzel', serif; }
+.font-display { font-family: 'Playfair Display', serif; font-weight: 700; }
+.font-display-bold { font-family: 'Playfair Display', serif; font-weight: 900; }
+.font-modern { font-family: 'Poppins', sans-serif; font-weight: 500; }
 .font-serif   { font-family: 'EB Garamond', Georgia, serif; }
 
 .luxury-text-gold {
@@ -62,41 +64,50 @@ body {
 /* ── Buttons ───────────────────────────────────────── */
 .luxury-btn {
   background: transparent;
-  border: 1px solid rgba(212,175,55,0.35);
+  border: 2px solid rgba(212,175,55,0.4);
   color: var(--gold);
-  font-family: 'Cinzel', serif;
-  font-size: 10px;
-  letter-spacing: 0.15em;
+  font-family: 'Poppins', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
   text-transform: uppercase;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.3s ease;
+  padding: 14px 28px;
+  border-radius: 8px;
 }
 .luxury-btn:hover {
-  background: rgba(212,175,55,0.08);
+  background: rgba(212,175,55,0.12);
   border-color: var(--gold);
-  box-shadow: 0 0 12px rgba(212,175,55,0.15);
+  box-shadow: 0 0 20px rgba(212,175,55,0.25);
+  transform: translateY(-2px);
 }
 
 .luxury-btn-primary {
-  background: linear-gradient(135deg, #2a2010 0%, #1a1508 100%);
-  border: 1px solid rgba(212,175,55,0.5);
+  background: linear-gradient(135deg, rgba(212,175,55,0.15) 0%, rgba(212,175,55,0.05) 100%);
+  border: 2px solid rgba(212,175,55,0.6);
   color: var(--gold);
-  font-family: 'Cinzel', serif;
-  font-size: 10px;
-  letter-spacing: 0.15em;
+  font-family: 'Poppins', sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
   cursor: pointer;
-  transition: all 0.2s ease;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.4), inset 0 1px 0 rgba(212,175,55,0.1);
+  transition: all 0.3s ease;
+  padding: 16px 32px;
+  border-radius: 8px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.4), inset 0 1px 0 rgba(212,175,55,0.15);
 }
 .luxury-btn-primary:hover {
-  background: linear-gradient(135deg, #3a3018 0%, #2a2010 100%);
-  border-color: var(--gold);
-  box-shadow: 0 4px 16px rgba(212,175,55,0.2), inset 0 1px 0 rgba(212,175,55,0.15);
+  background: linear-gradient(135deg, rgba(212,175,55,0.25) 0%, rgba(212,175,55,0.1) 100%);
+  border-color: var(--gold-light);
+  box-shadow: 0 8px 24px rgba(212,175,55,0.3), inset 0 1px 0 rgba(212,175,55,0.2);
+  transform: translateY(-3px);
 }
 .luxury-btn-primary:disabled {
   opacity: 0.4;
   cursor: not-allowed;
+  transform: none;
 }
 
 /* ── Board ─────────────────────────────────────────── */
