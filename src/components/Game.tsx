@@ -110,72 +110,74 @@ export default function GameLobby() {
   }
 
   return (
-    <div className="w-full flex-1 flex flex-col gap-6 max-w-md mx-auto mt-4 font-serif">
-      {/* إنشاء مباراة */}
-      <div className="luxury-panel p-8 text-center space-y-4">
-        <h3 className="text-xl font-display font-bold uppercase tracking-widest luxury-text-gold">
-          {t('create_game')}
-        </h3>
-        <p className="text-[10px] uppercase font-sans tracking-widest text-[#E6D5B8] opacity-60">
-          اختر نوع المباراة
-        </p>
-        <div className="flex gap-3 mt-2">
-          {[
-            { label: t('create_game'),  action: () => createGame('',      'waiting') },
-            { label: 'vs AI',           action: () => createGame('bot',   'playing') },
-            { label: 'Pass & Play',     action: () => createGame('local', 'playing') },
-          ].map(({ label, action }) => (
-            <button
-              key={label}
-              onClick={action}
-              className="flex-1 luxury-btn-primary py-4 rounded-[4px] text-xs font-display"
-            >
-              {label}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* قائمة الجلسات */}
-      <div className="luxury-panel p-6 flex flex-col">
-        <h3 className="text-sm font-display font-bold uppercase tracking-[0.2em] mb-4 pb-3 border-b border-[rgba(212,175,55,0.15)] luxury-text-gold">
-          {t('available_games')}
-        </h3>
-        {games.length === 0 ? (
-          <p className="text-[#E6D5B8] opacity-40 text-xs italic text-center py-4">
-            {t('no_games')}
+    <div className="w-full min-h-screen flex flex-col items-center justify-center px-4 py-6 font-serif">
+      <div className="w-full max-w-sm flex flex-col gap-4">
+        {/* إنشاء مباراة */}
+        <div className="luxury-panel p-6 sm:p-8 text-center space-y-4">
+          <h3 className="text-lg sm:text-xl font-display font-bold uppercase tracking-widest luxury-text-gold">
+            {t('create_game')}
+          </h3>
+          <p className="text-[10px] uppercase font-sans tracking-widest text-[#E6D5B8] opacity-60">
+            اختر نوع المباراة
           </p>
-        ) : (
-          <div className="space-y-3">
-            {games.map(game => (
-              <div
-                key={game.id}
-                className="flex justify-between items-center p-4 bg-[#12100E]/50 rounded-[4px] border border-[rgba(212,175,55,0.2)] hover:border-[#D4AF37] transition-colors"
+          <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 mt-2">
+            {[
+              { label: t('create_game'),  action: () => createGame('',      'waiting') },
+              { label: 'vs AI',           action: () => createGame('bot',   'playing') },
+              { label: 'Pass & Play',     action: () => createGame('local', 'playing') },
+            ].map(({ label, action }) => (
+              <button
+                key={label}
+                onClick={action}
+                className="flex-1 luxury-btn-primary py-3 sm:py-4 rounded-[4px] text-xs font-display"
               >
-                <div className="flex items-center gap-3">
-                  <div className="w-2 h-2 rounded-full bg-[#D4AF37] shadow-[0_0_8px_#D4AF37]" />
-                  <span className="text-xs font-bold text-[#E6D5B8] uppercase tracking-widest font-display">
-                    Session {game.id.slice(0, 6)}
-                  </span>
-                </div>
-                <button
-                  onClick={() => joinGame(game.id)}
-                  className="luxury-btn px-4 py-2 rounded-[2px] text-[10px]"
-                >
-                  {t('join_game')}
-                </button>
-              </div>
+                {label}
+              </button>
             ))}
           </div>
-        )}
-      </div>
+        </div>
 
-      {/* Network Status */}
-      <div className="flex justify-center items-center gap-3 bg-[#12100E] border border-[rgba(212,175,55,0.15)] rounded-lg py-4 text-center">
-        <span className="block w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-        <span className="text-[9px] uppercase font-bold text-[#D4AF37] opacity-60 font-display tracking-[0.2em]">
-          Synchronized
-        </span>
+        {/* قائمة الجلسات */}
+        <div className="luxury-panel p-4 sm:p-6 flex flex-col">
+          <h3 className="text-xs sm:text-sm font-display font-bold uppercase tracking-[0.2em] mb-4 pb-3 border-b border-[rgba(212,175,55,0.15)] luxury-text-gold text-center">
+            {t('available_games')}
+          </h3>
+          {games.length === 0 ? (
+            <p className="text-[#E6D5B8] opacity-40 text-xs italic text-center py-4">
+              {t('no_games')}
+            </p>
+          ) : (
+            <div className="space-y-3">
+              {games.map(game => (
+                <div
+                  key={game.id}
+                  className="flex flex-col sm:flex-row justify-between items-center gap-2 sm:gap-0 p-3 sm:p-4 bg-[#12100E]/50 rounded-[4px] border border-[rgba(212,175,55,0.2)] hover:border-[#D4AF37] transition-colors"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="w-2 h-2 rounded-full bg-[#D4AF37] shadow-[0_0_8px_#D4AF37]" />
+                    <span className="text-xs font-bold text-[#E6D5B8] uppercase tracking-widest font-display">
+                      Session {game.id.slice(0, 6)}
+                    </span>
+                  </div>
+                  <button
+                    onClick={() => joinGame(game.id)}
+                    className="luxury-btn px-4 py-2 rounded-[2px] text-[10px] w-full sm:w-auto"
+                  >
+                    {t('join_game')}
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Network Status */}
+        <div className="flex justify-center items-center gap-3 bg-[#12100E] border border-[rgba(212,175,55,0.15)] rounded-lg py-3 sm:py-4 text-center">
+          <span className="block w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+          <span className="text-[9px] uppercase font-bold text-[#D4AF37] opacity-60 font-display tracking-[0.2em]">
+            Synchronized
+          </span>
+        </div>
       </div>
     </div>
   );
@@ -487,168 +489,170 @@ function GameBoard({ gameId, onExit }: GameBoardProps) {
   const myRole: Role = isHost ? 'host' : 'guest';
 
   return (
-    <div className="flex-1 flex flex-col items-center gap-5 w-full max-w-2xl mx-auto mt-4 font-serif">
-
-      {/* Header اللعبة */}
-      <div className="flex justify-between items-center w-full luxury-panel p-4">
-        <div>
-          <h2 className="text-sm font-display font-bold uppercase tracking-[0.2em] luxury-text-gold">
-            {t('app_name')}
-          </h2>
-          <p className="text-[9px] text-[#E6D5B8] opacity-50 uppercase font-display tracking-widest mt-0.5">
-            {game.phase === 'placement' ? t('phase_placement') : t('phase_movement')}
-          </p>
+    <div className="w-full min-h-screen flex flex-col items-center justify-start px-3 sm:px-4 py-4 sm:py-6 font-serif">
+      <div className="w-full max-w-sm flex flex-col gap-3 sm:gap-4">
+        
+        {/* Header اللعبة */}
+        <div className="flex justify-between items-center w-full luxury-panel p-3 sm:p-4">
+          <div>
+            <h2 className="text-xs sm:text-sm font-display font-bold uppercase tracking-[0.15em] sm:tracking-[0.2em] luxury-text-gold">
+              {t('app_name')}
+            </h2>
+            <p className="text-[8px] sm:text-[9px] text-[#E6D5B8] opacity-50 uppercase font-display tracking-widest mt-0.5">
+              {game.phase === 'placement' ? t('phase_placement') : t('phase_movement')}
+            </p>
+          </div>
+          <button onClick={onExit} className="luxury-btn px-3 sm:px-4 py-2 rounded-[2px] text-[9px] sm:text-[10px]">
+            Exit
+          </button>
         </div>
-        <button onClick={onExit} className="luxury-btn px-4 py-2 rounded-[2px] text-[10px]">
-          Exit Room
-        </button>
-      </div>
 
-      {/* حالة اللاعبين */}
-      <div className="luxury-panel p-5 w-full flex flex-col gap-3">
-        <div className="flex justify-between items-center">
-          <div className="flex flex-col gap-1">
-            <span className={cn(
-              'text-xs font-display font-bold uppercase tracking-widest',
-              game.turn === 'host' ? 'luxury-text-gold' : 'text-[#E6D5B8] opacity-40'
+        {/* حالة اللاعبين */}
+        <div className="luxury-panel p-3 sm:p-5 w-full flex flex-col gap-2 sm:gap-3">
+          <div className="flex justify-between items-center">
+            <div className="flex flex-col gap-1">
+              <span className={cn(
+                'text-[10px] sm:text-xs font-display font-bold uppercase tracking-wider sm:tracking-widest',
+                game.turn === 'host' ? 'luxury-text-gold' : 'text-[#E6D5B8] opacity-40'
+              )}>
+                {hostName}
+              </span>
+              <span className="text-[7px] sm:text-[8px] px-1.5 sm:px-2 py-0.5 border border-[#4a3a2a] text-[#E6D5B8] opacity-70 uppercase tracking-wider sm:tracking-widest rounded bg-[#12100E] font-display">
+                {t('rocks')}
+              </span>
+            </div>
+
+            <span className="text-[10px] sm:text-[11px] font-bold luxury-text-gold uppercase tracking-[0.3em] sm:tracking-[0.4em] font-display">VS</span>
+
+            <div className="flex flex-col items-end gap-1">
+              <span className={cn(
+                'text-[10px] sm:text-xs font-display font-bold uppercase tracking-wider sm:tracking-widest',
+                game.turn === 'guest' ? 'luxury-text-gold' : 'text-[#E6D5B8] opacity-40'
+              )}>
+                {game.guestId ? guestName : 'Waiting...'}
+              </span>
+              <span className="text-[7px] sm:text-[8px] px-1.5 sm:px-2 py-0.5 border border-[#4a3a2a] text-[#E6D5B8] opacity-70 uppercase tracking-wider sm:tracking-widest rounded bg-[#12100E] font-display">
+                {t('date_pits')}
+              </span>
+            </div>
+          </div>
+
+          <div className="w-full h-px bg-[rgba(212,175,55,0.12)]" />
+
+          {/* حالة اللعبة */}
+          {game.status === 'waiting' && (
+            <p className="luxury-text-gold animate-pulse font-display text-xs sm:text-sm uppercase tracking-[0.15em] sm:tracking-[0.2em] text-center">
+              {t('waiting_for_opponent')}
+            </p>
+          )}
+          {game.status === 'playing' && (
+            <p className={cn(
+              'text-xs sm:text-sm font-display uppercase tracking-[0.15em] sm:tracking-[0.2em] text-center',
+              isMyTurn ? 'luxury-text-gold font-bold' : 'text-[#E6D5B8] opacity-40'
             )}>
-              {hostName}
-            </span>
-            <span className="text-[8px] px-2 py-0.5 border border-[#4a3a2a] text-[#E6D5B8] opacity-70 uppercase tracking-widest rounded bg-[#12100E] font-display">
+              {isMyTurn ? t('your_turn') : t('opponent_turn')}
+            </p>
+          )}
+          {game.status === 'finished' && (
+            <div className="flex flex-col items-center gap-2 sm:gap-3">
+              <p className={cn(
+                'text-lg sm:text-xl font-display font-bold uppercase tracking-[0.2em] sm:tracking-[0.3em]',
+                game.winner === myRole ? 'text-[#D4AF37]' : 'text-red-900/80'
+              )}>
+                {game.winner === myRole ? t('you_win') : t('you_lose')}
+              </p>
+              <button onClick={handlePlayAgain} className="luxury-btn-primary px-6 sm:px-8 py-2 sm:py-3 rounded-[4px] text-[10px] sm:text-xs">
+                Play Again
+              </button>
+            </div>
+          )}
+        </div>
+
+        {/* اللوح */}
+        <div className="w-full flex justify-center px-1">
+          <div className="w-full max-w-[320px] sm:max-w-[380px]">
+            <div className="board-outer">
+              <div className="grid grid-cols-7 gap-0 border-2 sm:border-4 board-grid">
+                {Array(49).fill(null).map((_, i) => renderCell(i))}
+              </div>
+            </div>
+            <div className="flex justify-between w-full text-[8px] sm:text-[9px] font-display font-bold uppercase tracking-[0.2em] sm:tracking-[0.3em] mt-2 sm:mt-4 px-1 text-[#D4AF37] opacity-60">
+              <span>7 x 7</span>
+              <span>{isMyTurn ? 'Action' : 'Standby'}</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Legend */}
+        <div className="flex justify-center gap-6 sm:gap-10 px-4 sm:px-6 py-3 sm:py-4 luxury-panel w-full">
+          <div className="flex items-center gap-2 sm:gap-3">
+            <div className="w-5 h-5 sm:w-6 sm:h-6 piece-host" />
+            <span className="text-[8px] sm:text-[9px] uppercase font-bold text-[#E6D5B8] tracking-[0.15em] sm:tracking-[0.2em] font-display">
               {t('rocks')}
             </span>
           </div>
-
-          <span className="text-[11px] font-bold luxury-text-gold uppercase tracking-[0.4em] font-display">VS</span>
-
-          <div className="flex flex-col items-end gap-1">
-            <span className={cn(
-              'text-xs font-display font-bold uppercase tracking-widest',
-              game.turn === 'guest' ? 'luxury-text-gold' : 'text-[#E6D5B8] opacity-40'
-            )}>
-              {game.guestId ? guestName : 'Waiting...'}
-            </span>
-            <span className="text-[8px] px-2 py-0.5 border border-[#4a3a2a] text-[#E6D5B8] opacity-70 uppercase tracking-widest rounded bg-[#12100E] font-display">
+          <div className="flex items-center gap-2 sm:gap-3">
+            <div className="w-3 h-3 sm:w-4 sm:h-4 piece-guest" />
+            <span className="text-[8px] sm:text-[9px] uppercase font-bold text-[#E6D5B8] tracking-[0.15em] sm:tracking-[0.2em] font-display">
               {t('date_pits')}
             </span>
           </div>
         </div>
 
-        <div className="w-full h-px bg-[rgba(212,175,55,0.12)]" />
-
-        {/* حالة اللعبة */}
-        {game.status === 'waiting' && (
-          <p className="luxury-text-gold animate-pulse font-display text-sm uppercase tracking-[0.2em] text-center">
-            {t('waiting_for_opponent')}
-          </p>
-        )}
-        {game.status === 'playing' && (
-          <p className={cn(
-            'text-sm font-display uppercase tracking-[0.2em] text-center',
-            isMyTurn ? 'luxury-text-gold font-bold' : 'text-[#E6D5B8] opacity-40'
-          )}>
-            {isMyTurn ? t('your_turn') : t('opponent_turn')}
-          </p>
-        )}
-        {game.status === 'finished' && (
-          <div className="flex flex-col items-center gap-3">
-            <p className={cn(
-              'text-xl font-display font-bold uppercase tracking-[0.3em]',
-              game.winner === myRole ? 'text-[#D4AF37]' : 'text-red-900/80'
-            )}>
-              {game.winner === myRole ? t('you_win') : t('you_lose')}
-            </p>
-            <button onClick={handlePlayAgain} className="luxury-btn-primary px-8 py-3 rounded-[4px] text-xs">
-              Play Again
-            </button>
-          </div>
-        )}
-      </div>
-
-      {/* اللوح */}
-      <div className="w-full flex justify-center">
-        <div className="w-full max-w-[420px]">
-          <div className="board-outer">
-            <div className="grid grid-cols-7 gap-0 border-4 board-grid">
-              {Array(49).fill(null).map((_, i) => renderCell(i))}
-            </div>
-          </div>
-          <div className="flex justify-between w-full text-[9px] font-display font-bold uppercase tracking-[0.3em] mt-4 px-1 text-[#D4AF37] opacity-60">
-            <span>7 × 7</span>
-            <span>{isMyTurn ? '⬤ Action' : '○ Standby'}</span>
-          </div>
-        </div>
-      </div>
-
-      {/* Legend */}
-      <div className="flex justify-center gap-10 px-6 py-4 luxury-panel w-full">
-        <div className="flex items-center gap-3">
-          <div className="w-6 h-6 piece-host" />
-          <span className="text-[9px] uppercase font-bold text-[#E6D5B8] tracking-[0.2em] font-display">
-            {t('rocks')}
-          </span>
-        </div>
-        <div className="flex items-center gap-3">
-          <div className="w-4 h-4 piece-guest" />
-          <span className="text-[9px] uppercase font-bold text-[#E6D5B8] tracking-[0.2em] font-display">
-            {t('date_pits')}
-          </span>
-        </div>
-      </div>
-
-      {/* Chat */}
-      <div className="w-full luxury-panel flex flex-col h-72 mb-4">
-        <h3 className="text-[9px] font-display uppercase font-bold tracking-[0.25em] luxury-text-gold border-b border-[rgba(212,175,55,0.15)] px-6 py-4">
-          Room Ledger
-        </h3>
-        <div ref={chatRef} className="flex-1 overflow-y-auto space-y-3 px-6 py-4">
-          {messages.length === 0 ? (
-            <p className="text-xs text-center text-[#E6D5B8] opacity-30 mt-4 font-display uppercase tracking-widest leading-loose">
-              The records are empty.<br />Speak, traveler.
-            </p>
-          ) : (
-            messages.map(msg => {
-              const isMine = msg.senderId === uid;
-              const time   = msg.createdAt?.toDate
-                ? msg.createdAt.toDate().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-                : '';
-              return (
-                <div key={msg.id} className={cn('flex flex-col', isMine ? 'items-end' : 'items-start')}>
-                  <div className={cn(
-                    'max-w-[85%] px-4 py-2 rounded text-sm border',
-                    isMine
-                      ? 'bg-[#2c241b] text-[#D4AF37] rounded-br-[2px] border-[rgba(212,175,55,0.5)]'
-                      : 'bg-[#12100E] text-[#E6D5B8] rounded-bl-[2px] border-[#4a3a2a]'
-                  )}>
-                    {msg.text}
+        {/* Chat */}
+        <div className="w-full luxury-panel flex flex-col h-56 sm:h-72 mb-2 sm:mb-4">
+          <h3 className="text-[8px] sm:text-[9px] font-display uppercase font-bold tracking-[0.2em] sm:tracking-[0.25em] luxury-text-gold border-b border-[rgba(212,175,55,0.15)] px-4 sm:px-6 py-3 sm:py-4">
+            Room Ledger
+          </h3>
+          <div ref={chatRef} className="flex-1 overflow-y-auto space-y-2 sm:space-y-3 px-3 sm:px-6 py-3 sm:py-4">
+            {messages.length === 0 ? (
+              <p className="text-[10px] sm:text-xs text-center text-[#E6D5B8] opacity-30 mt-2 sm:mt-4 font-display uppercase tracking-wider sm:tracking-widest leading-loose">
+                The records are empty.<br />Speak, traveler.
+              </p>
+            ) : (
+              messages.map(msg => {
+                const isMine = msg.senderId === uid;
+                const time   = msg.createdAt?.toDate
+                  ? msg.createdAt.toDate().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+                  : '';
+                return (
+                  <div key={msg.id} className={cn('flex flex-col', isMine ? 'items-end' : 'items-start')}>
+                    <div className={cn(
+                      'max-w-[85%] px-3 sm:px-4 py-2 rounded text-xs sm:text-sm border',
+                      isMine
+                        ? 'bg-[#2c241b] text-[#D4AF37] rounded-br-[2px] border-[rgba(212,175,55,0.5)]'
+                        : 'bg-[#12100E] text-[#E6D5B8] rounded-bl-[2px] border-[#4a3a2a]'
+                    )}>
+                      {msg.text}
+                    </div>
+                    {time && (
+                      <span className="text-[7px] sm:text-[8px] text-[#E6D5B8] opacity-30 font-display mt-1 px-1">
+                        {time}
+                      </span>
+                    )}
                   </div>
-                  {time && (
-                    <span className="text-[8px] text-[#E6D5B8] opacity-30 font-display mt-1 px-1">
-                      {time}
-                    </span>
-                  )}
-                </div>
-              );
-            })
-          )}
+                );
+              })
+            )}
+          </div>
+          <form onSubmit={sendMessage} className="p-3 sm:p-4 border-t border-[rgba(212,175,55,0.15)] bg-black/20 flex gap-2 sm:gap-3">
+            <input
+              type="text"
+              value={chatText}
+              onChange={e => setChatText(e.target.value)}
+              disabled={game.status === 'waiting'}
+              placeholder={game.status === 'waiting' ? 'Waiting...' : 'Message...'}
+              className="flex-1 px-3 sm:px-4 py-2 bg-[#12100E] border border-[#4a3a2a] rounded-[4px] text-xs sm:text-sm text-[#E6D5B8] placeholder:text-[#E6D5B8]/40 focus:outline-none focus:border-[#D4AF37] disabled:opacity-50"
+            />
+            <button
+              type="submit"
+              disabled={!chatText.trim() || game.status === 'waiting'}
+              className="luxury-btn-primary px-3 sm:px-4 py-2 rounded-[4px] disabled:opacity-50"
+            >
+              <Send size={14} className="sm:w-4 sm:h-4" />
+            </button>
+          </form>
         </div>
-        <form onSubmit={sendMessage} className="p-4 border-t border-[rgba(212,175,55,0.15)] bg-black/20 flex gap-3">
-          <input
-            type="text"
-            value={chatText}
-            onChange={e => setChatText(e.target.value)}
-            disabled={game.status === 'waiting'}
-            placeholder={game.status === 'waiting' ? 'Waiting for opponent...' : 'Inscribe a message...'}
-            className="flex-1 px-4 py-2 bg-[#12100E] border border-[#4a3a2a] rounded-[4px] text-sm text-[#E6D5B8] placeholder:text-[#E6D5B8]/40 focus:outline-none focus:border-[#D4AF37] disabled:opacity-50"
-          />
-          <button
-            type="submit"
-            disabled={!chatText.trim() || game.status === 'waiting'}
-            className="luxury-btn-primary px-4 py-2 rounded-[4px] disabled:opacity-50"
-          >
-            <Send size={16} />
-          </button>
-        </form>
       </div>
     </div>
   );
