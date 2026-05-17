@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import { motion } from 'motion/react';
+import { motion, AnimatePresence } from 'motion/react';
 import { db, auth } from '../firebase/config';
 import {
   doc, onSnapshot, updateDoc, runTransaction,
@@ -17,7 +17,7 @@ import {
 import { cn } from '../lib/utils';
 import { playSound } from '../lib/sounds';
 import type { GameDoc, ChatMessage, GameBoardProps } from '../types';
-import { Send } from 'lucide-react';
+import { Send, Users, Bot, Smartphone, ArrowLeft, Circle } from 'lucide-react';
 
 // ── Helpers ────────────────────────────────────────────
 function newGameId(): string {
@@ -40,7 +40,6 @@ export default function GameLobby() {
   useEffect(() => {
     if (!uid) return;
 
-    // ألعاب المستخدم النشطة
     const myGames = (field: 'hostId' | 'guestId') =>
       query(
         collection(db, 'games'),
@@ -57,7 +56,6 @@ export default function GameLobby() {
     const unsub2 = onSnapshot(myGames('guestId'), handleMyGame,
       e => handleFirestoreError(e, OperationType.LIST, 'games'));
 
-    // قائمة الجلسات المتاحة
     const qWait = query(collection(db, 'games'), where('status', '==', 'waiting'));
     const unsubWait = onSnapshot(qWait, snap => {
       const list = snap.docs
@@ -109,59 +107,92 @@ export default function GameLobby() {
     return <GameBoard gameId={activeGameId} onExit={() => setActiveGameId(null)} />;
   }
 
+  const gameModes = [
+    { 
+      id: 'online', 
+      icon: Users, 
+      label: t('create_game'), 
+      desc: 'Play with friends',
+      action: () => createGame('', 'waiting') 
+    },
+    { 
+      id: 'bot', 
+      icon: Bot, 
+      label: 'vs AI', 
+      desc: 'Challenge the bot',
+      action: () => createGame('bot', 'playing') 
+    },
+    { 
+      id: 'local', 
+      icon: Smartphone, 
+      label: 'Local', 
+      desc: 'Pass & Play',
+      action: () => createGame('local', 'playing') 
+    },
+  ];
+
   return (
-    <div className="w-full min-h-screen flex flex-col items-center justify-center px-4 py-6 font-serif">
-      <div className="w-full max-w-sm flex flex-col gap-4">
-        {/* إنشاء مباراة */}
-        <div className="luxury-panel p-6 sm:p-8 text-center space-y-4">
-          <h3 className="text-lg sm:text-xl font-display font-bold uppercase tracking-widest luxury-text-gold">
-            {t('create_game')}
-          </h3>
-          <p className="text-[10px] uppercase font-sans tracking-widest text-[#E6D5B8] opacity-60">
-            اختر نوع المباراة
-          </p>
-          <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 mt-2">
-            {[
-              { label: t('create_game'),  action: () => createGame('',      'waiting') },
-              { label: 'vs AI',           action: () => createGame('bot',   'playing') },
-              { label: 'Pass & Play',     action: () => createGame('local', 'playing') },
-            ].map(({ label, action }) => (
+    <div className="flex-1 flex items-center justify-center px-4 py-8">
+      <div className="w-full max-w-md space-y-6 animate-fade-in">
+        
+        {/* Game Modes */}
+        <div className="card-elevated p-6 space-y-5">
+          <div className="text-center">
+            <h2 className="text-lg font-display text-gold-glow">{t('create_game')}</h2>
+            <p className="text-xs text-[#6B6560] mt-1">Choose game mode</p>
+          </div>
+          
+          <div className="grid grid-cols-3 gap-3">
+            {gameModes.map(({ id, icon: Icon, label, desc, action }) => (
               <button
-                key={label}
+                key={id}
                 onClick={action}
-                className="flex-1 luxury-btn-primary py-3 sm:py-4 rounded-[4px] text-xs font-display"
+                className="flex flex-col items-center gap-2 p-4 rounded-xl bg-[#0F0E0C] border border-[#C9A55C]/10 hover:border-[#C9A55C]/30 hover:bg-[#C9A55C]/5 transition-all duration-200 group"
               >
-                {label}
+                <div className="w-10 h-10 rounded-lg bg-[#C9A55C]/10 flex items-center justify-center group-hover:bg-[#C9A55C]/20 transition-colors">
+                  <Icon size={20} className="text-[#C9A55C]" />
+                </div>
+                <span className="text-xs font-medium text-[#F5F0E8]">{label}</span>
+                <span className="text-[10px] text-[#6B6560]">{desc}</span>
               </button>
             ))}
           </div>
         </div>
 
-        {/* قائمة الجلسات */}
-        <div className="luxury-panel p-4 sm:p-6 flex flex-col">
-          <h3 className="text-xs sm:text-sm font-display font-bold uppercase tracking-[0.2em] mb-4 pb-3 border-b border-[rgba(212,175,55,0.15)] luxury-text-gold text-center">
-            {t('available_games')}
-          </h3>
+        {/* Available Games */}
+        <div className="card p-5 space-y-4">
+          <div className="flex items-center justify-between">
+            <h3 className="text-sm font-medium text-[#A8A095]">{t('available_games')}</h3>
+            <span className="status-badge status-playing">
+              <span className="status-dot bg-[#4ADE80]" />
+              Live
+            </span>
+          </div>
+          
           {games.length === 0 ? (
-            <p className="text-[#E6D5B8] opacity-40 text-xs italic text-center py-4">
-              {t('no_games')}
-            </p>
+            <div className="py-8 text-center">
+              <div className="w-12 h-12 rounded-xl bg-[#C9A55C]/5 flex items-center justify-center mx-auto mb-3">
+                <Users size={20} className="text-[#6B6560]" />
+              </div>
+              <p className="text-sm text-[#6B6560]">{t('no_games')}</p>
+              <p className="text-xs text-[#4A4540] mt-1">Create a game to start playing</p>
+            </div>
           ) : (
-            <div className="space-y-3">
+            <div className="space-y-2">
               {games.map(game => (
                 <div
                   key={game.id}
-                  className="flex flex-col sm:flex-row justify-between items-center gap-2 sm:gap-0 p-3 sm:p-4 bg-[#12100E]/50 rounded-[4px] border border-[rgba(212,175,55,0.2)] hover:border-[#D4AF37] transition-colors"
+                  className="flex items-center justify-between p-3 rounded-xl bg-[#0F0E0C] border border-[#C9A55C]/10 hover:border-[#C9A55C]/20 transition-colors"
                 >
                   <div className="flex items-center gap-3">
-                    <div className="w-2 h-2 rounded-full bg-[#D4AF37] shadow-[0_0_8px_#D4AF37]" />
-                    <span className="text-xs font-bold text-[#E6D5B8] uppercase tracking-widest font-display">
-                      Session {game.id.slice(0, 6)}
+                    <div className="player-indicator active" />
+                    <span className="text-sm font-medium text-[#F5F0E8]">
+                      Game #{game.id.slice(0, 6)}
                     </span>
                   </div>
                   <button
                     onClick={() => joinGame(game.id)}
-                    className="luxury-btn px-4 py-2 rounded-[2px] text-[10px] w-full sm:w-auto"
+                    className="btn btn-primary !py-2 !px-4 !text-xs"
                   >
                     {t('join_game')}
                   </button>
@@ -171,12 +202,10 @@ export default function GameLobby() {
           )}
         </div>
 
-        {/* Network Status */}
-        <div className="flex justify-center items-center gap-3 bg-[#12100E] border border-[rgba(212,175,55,0.15)] rounded-lg py-3 sm:py-4 text-center">
-          <span className="block w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-          <span className="text-[9px] uppercase font-bold text-[#D4AF37] opacity-60 font-display tracking-[0.2em]">
-            Synchronized
-          </span>
+        {/* Connection Status */}
+        <div className="flex items-center justify-center gap-2 py-2">
+          <div className="w-2 h-2 rounded-full bg-[#4ADE80] animate-pulse" />
+          <span className="text-[10px] text-[#6B6560] uppercase tracking-wider">Connected</span>
         </div>
       </div>
     </div>
@@ -196,6 +225,7 @@ function GameBoard({ gameId, onExit }: GameBoardProps) {
   const [chatText, setChatText]   = useState('');
   const [hostName, setHostName]   = useState('Player 1');
   const [guestName, setGuestName] = useState('Player 2');
+  const [showChat, setShowChat]   = useState(false);
   const chatRef                   = useRef<HTMLDivElement>(null);
   const prevGameRef               = useRef<GameDoc | null>(null);
 
@@ -222,7 +252,7 @@ function GameBoard({ gameId, onExit }: GameBoardProps) {
     return () => { unsub(); unsubMsg(); };
   }, [gameId, onExit]);
 
-  // ── أسماء اللاعبين ─────────────────────────────────
+  // ── Player Names ─────────────────────────────────
   useEffect(() => {
     if (!game?.hostId) return;
     getDoc(doc(db, 'users', game.hostId))
@@ -233,13 +263,13 @@ function GameBoard({ gameId, onExit }: GameBoardProps) {
   useEffect(() => {
     if (!game?.guestId) return;
     if (game.guestId === 'bot')   { setGuestName('Computer');         return; }
-    if (game.guestId === 'local') { setGuestName('Player 2 (Local)'); return; }
+    if (game.guestId === 'local') { setGuestName('Player 2'); return; }
     getDoc(doc(db, 'users', game.guestId))
       .then(s => s.exists() && setGuestName(s.data().displayName))
       .catch(() => {});
   }, [game?.guestId]);
 
-  // ── الأصوات ────────────────────────────────────────
+  // ── Sounds ────────────────────────────────────────
   useEffect(() => {
     if (!game || !prevGameRef.current) { prevGameRef.current = game; return; }
     const prev = prevGameRef.current;
@@ -258,7 +288,7 @@ function GameBoard({ gameId, onExit }: GameBoardProps) {
     prevGameRef.current = game;
   }, [game, uid]);
 
-  // ── مشتق من حالة اللعبة ────────────────────────────
+  // ── Derived State ────────────────────────────
   const isHost    = uid === game?.hostId;
   const isGuest   = uid === game?.guestId;
   const isLocal   = game?.guestId === 'local';
@@ -266,7 +296,7 @@ function GameBoard({ gameId, onExit }: GameBoardProps) {
     || (isHost  && game?.turn === 'host')
     || (isGuest && game?.turn === 'guest');
 
-  // ── commitUpdate — كل writes تمر من هنا ──────────
+  // ── commitUpdate ──────────
   const commitUpdate = useCallback(async (updates: Partial<GameDoc>) => {
     const full = { ...updates, updatedAt: serverTimestamp() };
     setGame(prev => prev ? { ...prev, ...updates } : prev);
@@ -277,14 +307,13 @@ function GameBoard({ gameId, onExit }: GameBoardProps) {
     }
   }, [gameId]);
 
-  // ── commitTransaction — للـ multiplayer ───────────
+  // ── commitTransaction ───────────
   const commitTransaction = useCallback(async (updates: Partial<GameDoc>) => {
     try {
       await runTransaction(db, async (tx) => {
         const snap = await tx.get(doc(db, 'games', gameId));
         if (!snap.exists()) throw new Error('Game not found');
         const current = snap.data() as GameDoc;
-        // تحقق أن الدور لم يتغير بين النقر والكتابة
         const myRole: Role = isHost ? 'host' : 'guest';
         if (current.turn !== myRole && !isLocal) throw new Error('Not your turn');
         tx.update(doc(db, 'games', gameId), { ...updates, updatedAt: serverTimestamp() });
@@ -347,7 +376,7 @@ function GameBoard({ gameId, onExit }: GameBoardProps) {
     const placed = countPieces(game.board, '1') + countPieces(game.board, '2');
     const isMultiplayer = !isLocal && game.guestId !== 'bot';
 
-    // ── طور التوضع ──────────────────────────────────
+    // Placement phase
     if (game.phase === 'placement') {
       if (idx === CENTER_IDX || game.board[idx] !== '') return;
 
@@ -367,7 +396,7 @@ function GameBoard({ gameId, onExit }: GameBoardProps) {
       return;
     }
 
-    // ── طور الحركة ──────────────────────────────────
+    // Movement phase
     if (game.board[idx] === myPiece) {
       setSelectedIdx(idx);
       return;
@@ -439,49 +468,35 @@ function GameBoard({ gameId, onExit }: GameBoardProps) {
         key={idx}
         onClick={() => handleCellClick(idx)}
         className={cn(
-          'w-full pt-[100%] relative cursor-pointer transition-all duration-150',
-          isEven
-            ? 'board-cell-light hover:brightness-110'
-            : 'board-cell-dark  hover:brightness-110',
-          isValidTarget && 'ring-1 ring-inset ring-[#D4AF37]/60'
+          'cell',
+          isEven ? 'cell-light' : 'cell-dark',
+          isValidTarget && 'cell-valid'
         )}
       >
-        <div className="absolute inset-0 flex items-center justify-center">
-          {content === '1' && (
-            <motion.div
-              initial={{ scale: 0, opacity: 0 }}
-              animate={{ scale: isSelected ? 1.1 : 1, opacity: 1 }}
-              transition={{ type: 'spring', stiffness: 400, damping: 25 }}
-              className={cn(
-                'w-[75%] h-[75%] piece-host',
-                isSelected && 'ring-2 ring-offset-1 ring-offset-[#5a452a] ring-[#D4AF37]'
-              )}
-            />
-          )}
-          {content === '2' && (
-            <motion.div
-              initial={{ scale: 0, opacity: 0 }}
-              animate={{ scale: isSelected ? 1.1 : 1, opacity: 1 }}
-              transition={{ type: 'spring', stiffness: 400, damping: 25 }}
-              className={cn(
-                'w-[45%] h-[45%] piece-guest',
-                isSelected && 'ring-2 ring-offset-1 ring-offset-[#5a452a] ring-[#D4AF37]'
-              )}
-            />
-          )}
-          {/* نقطة صغيرة للخلايا الهدف */}
-          {isValidTarget && content === '' && (
-            <div className="w-[20%] h-[20%] rounded-full bg-[#D4AF37]/40" />
-          )}
-        </div>
+        {content === '1' && (
+          <motion.div
+            initial={{ scale: 0, opacity: 0 }}
+            animate={{ scale: isSelected ? 1.1 : 1, opacity: 1 }}
+            transition={{ type: 'spring', stiffness: 400, damping: 25 }}
+            className={cn('piece piece-rock', isSelected && 'piece-selected')}
+          />
+        )}
+        {content === '2' && (
+          <motion.div
+            initial={{ scale: 0, opacity: 0 }}
+            animate={{ scale: isSelected ? 1.1 : 1, opacity: 1 }}
+            transition={{ type: 'spring', stiffness: 400, damping: 25 }}
+            className={cn('piece piece-seed', isSelected && 'piece-selected')}
+          />
+        )}
       </div>
     );
   };
 
   if (!game) {
     return (
-      <div className="p-8 text-center luxury-text-gold font-display tracking-widest uppercase animate-pulse">
-        {t('loading')}
+      <div className="flex-1 flex items-center justify-center">
+        <div className="w-8 h-8 border-2 border-[#C9A55C] border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
@@ -489,171 +504,168 @@ function GameBoard({ gameId, onExit }: GameBoardProps) {
   const myRole: Role = isHost ? 'host' : 'guest';
 
   return (
-    <div className="w-full min-h-screen flex flex-col items-center justify-start px-3 sm:px-4 py-4 sm:py-6 font-serif">
-      <div className="w-full max-w-sm flex flex-col gap-3 sm:gap-4">
-        
-        {/* Header اللعبة */}
-        <div className="flex justify-between items-center w-full luxury-panel p-3 sm:p-4">
-          <div>
-            <h2 className="text-xs sm:text-sm font-display font-bold uppercase tracking-[0.15em] sm:tracking-[0.2em] luxury-text-gold">
-              {t('app_name')}
-            </h2>
-            <p className="text-[8px] sm:text-[9px] text-[#E6D5B8] opacity-50 uppercase font-display tracking-widest mt-0.5">
-              {game.phase === 'placement' ? t('phase_placement') : t('phase_movement')}
-            </p>
+    <div className="flex-1 flex flex-col items-center px-4 py-4 sm:py-6 max-w-md mx-auto w-full">
+      
+      {/* Header */}
+      <div className="w-full flex items-center justify-between mb-4">
+        <button onClick={onExit} className="btn btn-ghost !p-2.5">
+          <ArrowLeft size={18} />
+        </button>
+        <div className="text-center">
+          <h2 className="text-sm font-display text-gold">{t('app_name')}</h2>
+          <p className="text-[10px] text-[#6B6560] capitalize">
+            {game.phase === 'placement' ? t('phase_placement') : t('phase_movement')}
+          </p>
+        </div>
+        <div className="w-10" /> {/* Spacer for centering */}
+      </div>
+
+      {/* Players Status */}
+      <div className="w-full card-game p-4 mb-4 space-y-3">
+        <div className="flex items-center justify-between">
+          {/* Host */}
+          <div className={cn(
+            'player-badge flex-1 max-w-[140px]',
+            game.turn === 'host' && 'active'
+          )}>
+            <div className={cn('player-indicator', game.turn === 'host' && 'active')} />
+            <div className="min-w-0 flex-1">
+              <p className="text-xs font-medium text-[#F5F0E8] truncate">{hostName}</p>
+              <p className="text-[9px] text-[#6B6560]">{t('rocks')}</p>
+            </div>
           </div>
-          <button onClick={onExit} className="luxury-btn px-3 sm:px-4 py-2 rounded-[2px] text-[9px] sm:text-[10px]">
-            Exit
-          </button>
+
+          <span className="text-xs font-medium text-[#C9A55C] px-3">VS</span>
+
+          {/* Guest */}
+          <div className={cn(
+            'player-badge flex-1 max-w-[140px] flex-row-reverse text-right',
+            game.turn === 'guest' && 'active'
+          )}>
+            <div className={cn('player-indicator', game.turn === 'guest' && 'active')} />
+            <div className="min-w-0 flex-1">
+              <p className="text-xs font-medium text-[#F5F0E8] truncate">
+                {game.guestId ? guestName : 'Waiting...'}
+              </p>
+              <p className="text-[9px] text-[#6B6560]">{t('date_pits')}</p>
+            </div>
+          </div>
         </div>
 
-        {/* حالة اللاعبين */}
-        <div className="luxury-panel p-3 sm:p-5 w-full flex flex-col gap-2 sm:gap-3">
-          <div className="flex justify-between items-center">
-            <div className="flex flex-col gap-1">
-              <span className={cn(
-                'text-[10px] sm:text-xs font-display font-bold uppercase tracking-wider sm:tracking-widest',
-                game.turn === 'host' ? 'luxury-text-gold' : 'text-[#E6D5B8] opacity-40'
-              )}>
-                {hostName}
-              </span>
-              <span className="text-[7px] sm:text-[8px] px-1.5 sm:px-2 py-0.5 border border-[#4a3a2a] text-[#E6D5B8] opacity-70 uppercase tracking-wider sm:tracking-widest rounded bg-[#12100E] font-display">
-                {t('rocks')}
-              </span>
-            </div>
-
-            <span className="text-[10px] sm:text-[11px] font-bold luxury-text-gold uppercase tracking-[0.3em] sm:tracking-[0.4em] font-display">VS</span>
-
-            <div className="flex flex-col items-end gap-1">
-              <span className={cn(
-                'text-[10px] sm:text-xs font-display font-bold uppercase tracking-wider sm:tracking-widest',
-                game.turn === 'guest' ? 'luxury-text-gold' : 'text-[#E6D5B8] opacity-40'
-              )}>
-                {game.guestId ? guestName : 'Waiting...'}
-              </span>
-              <span className="text-[7px] sm:text-[8px] px-1.5 sm:px-2 py-0.5 border border-[#4a3a2a] text-[#E6D5B8] opacity-70 uppercase tracking-wider sm:tracking-widest rounded bg-[#12100E] font-display">
-                {t('date_pits')}
-              </span>
-            </div>
-          </div>
-
-          <div className="w-full h-px bg-[rgba(212,175,55,0.12)]" />
-
-          {/* حالة اللعبة */}
+        {/* Game Status */}
+        <div className="text-center py-2">
           {game.status === 'waiting' && (
-            <p className="luxury-text-gold animate-pulse font-display text-xs sm:text-sm uppercase tracking-[0.15em] sm:tracking-[0.2em] text-center">
+            <div className="status-badge status-waiting mx-auto">
+              <span className="status-dot bg-[#C9A55C]" />
               {t('waiting_for_opponent')}
-            </p>
+            </div>
           )}
           {game.status === 'playing' && (
             <p className={cn(
-              'text-xs sm:text-sm font-display uppercase tracking-[0.15em] sm:tracking-[0.2em] text-center',
-              isMyTurn ? 'luxury-text-gold font-bold' : 'text-[#E6D5B8] opacity-40'
+              'text-sm font-medium',
+              isMyTurn ? 'text-[#C9A55C]' : 'text-[#6B6560]'
             )}>
               {isMyTurn ? t('your_turn') : t('opponent_turn')}
             </p>
           )}
           {game.status === 'finished' && (
-            <div className="flex flex-col items-center gap-2 sm:gap-3">
+            <div className="space-y-3">
               <p className={cn(
-                'text-lg sm:text-xl font-display font-bold uppercase tracking-[0.2em] sm:tracking-[0.3em]',
-                game.winner === myRole ? 'text-[#D4AF37]' : 'text-red-900/80'
+                'text-xl font-display font-bold',
+                game.winner === myRole ? 'text-[#C9A55C]' : 'text-[#EF4444]'
               )}>
                 {game.winner === myRole ? t('you_win') : t('you_lose')}
               </p>
-              <button onClick={handlePlayAgain} className="luxury-btn-primary px-6 sm:px-8 py-2 sm:py-3 rounded-[4px] text-[10px] sm:text-xs">
+              <button onClick={handlePlayAgain} className="btn btn-primary">
                 Play Again
               </button>
             </div>
           )}
         </div>
+      </div>
 
-        {/* اللوح */}
-        <div className="w-full flex justify-center px-1">
-          <div className="w-full max-w-[320px] sm:max-w-[380px]">
-            <div className="board-outer">
-              <div className="grid grid-cols-7 gap-0 border-2 sm:border-4 board-grid">
-                {Array(49).fill(null).map((_, i) => renderCell(i))}
-              </div>
-            </div>
-            <div className="flex justify-between w-full text-[8px] sm:text-[9px] font-display font-bold uppercase tracking-[0.2em] sm:tracking-[0.3em] mt-2 sm:mt-4 px-1 text-[#D4AF37] opacity-60">
-              <span>7 x 7</span>
-              <span>{isMyTurn ? 'Action' : 'Standby'}</span>
+      {/* Board */}
+      <div className="w-full flex justify-center mb-4">
+        <div className="w-full max-w-[340px]">
+          <div className="board-container">
+            <div className="board-grid">
+              {Array(49).fill(null).map((_, i) => renderCell(i))}
             </div>
           </div>
-        </div>
-
-        {/* Legend */}
-        <div className="flex justify-center gap-6 sm:gap-10 px-4 sm:px-6 py-3 sm:py-4 luxury-panel w-full">
-          <div className="flex items-center gap-2 sm:gap-3">
-            <div className="w-5 h-5 sm:w-6 sm:h-6 piece-host" />
-            <span className="text-[8px] sm:text-[9px] uppercase font-bold text-[#E6D5B8] tracking-[0.15em] sm:tracking-[0.2em] font-display">
-              {t('rocks')}
-            </span>
-          </div>
-          <div className="flex items-center gap-2 sm:gap-3">
-            <div className="w-3 h-3 sm:w-4 sm:h-4 piece-guest" />
-            <span className="text-[8px] sm:text-[9px] uppercase font-bold text-[#E6D5B8] tracking-[0.15em] sm:tracking-[0.2em] font-display">
-              {t('date_pits')}
+          <div className="flex justify-between mt-3 px-1 text-[10px] text-[#6B6560]">
+            <span>7 x 7</span>
+            <span className={isMyTurn ? 'text-[#C9A55C]' : ''}>
+              {isMyTurn ? 'Your Move' : 'Waiting'}
             </span>
           </div>
         </div>
+      </div>
 
-        {/* Chat */}
-        <div className="w-full luxury-panel flex flex-col h-56 sm:h-72 mb-2 sm:mb-4">
-          <h3 className="text-[8px] sm:text-[9px] font-display uppercase font-bold tracking-[0.2em] sm:tracking-[0.25em] luxury-text-gold border-b border-[rgba(212,175,55,0.15)] px-4 sm:px-6 py-3 sm:py-4">
-            Room Ledger
-          </h3>
-          <div ref={chatRef} className="flex-1 overflow-y-auto space-y-2 sm:space-y-3 px-3 sm:px-6 py-3 sm:py-4">
-            {messages.length === 0 ? (
-              <p className="text-[10px] sm:text-xs text-center text-[#E6D5B8] opacity-30 mt-2 sm:mt-4 font-display uppercase tracking-wider sm:tracking-widest leading-loose">
-                The records are empty.<br />Speak, traveler.
-              </p>
-            ) : (
-              messages.map(msg => {
-                const isMine = msg.senderId === uid;
-                const time   = msg.createdAt?.toDate
-                  ? msg.createdAt.toDate().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-                  : '';
-                return (
-                  <div key={msg.id} className={cn('flex flex-col', isMine ? 'items-end' : 'items-start')}>
-                    <div className={cn(
-                      'max-w-[85%] px-3 sm:px-4 py-2 rounded text-xs sm:text-sm border',
-                      isMine
-                        ? 'bg-[#2c241b] text-[#D4AF37] rounded-br-[2px] border-[rgba(212,175,55,0.5)]'
-                        : 'bg-[#12100E] text-[#E6D5B8] rounded-bl-[2px] border-[#4a3a2a]'
-                    )}>
-                      {msg.text}
-                    </div>
-                    {time && (
-                      <span className="text-[7px] sm:text-[8px] text-[#E6D5B8] opacity-30 font-display mt-1 px-1">
-                        {time}
-                      </span>
-                    )}
+      {/* Legend */}
+      <div className="flex justify-center gap-8 mb-4">
+        <div className="flex items-center gap-2">
+          <div className="w-5 h-5 piece piece-rock" />
+          <span className="text-xs text-[#A8A095]">{t('rocks')}</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <div className="w-3.5 h-3.5 piece piece-seed" />
+          <span className="text-xs text-[#A8A095]">{t('date_pits')}</span>
+        </div>
+      </div>
+
+      {/* Chat Section */}
+      <div className="w-full chat-container flex flex-col flex-1 min-h-[200px] max-h-[280px]">
+        <div className="flex items-center justify-between px-4 py-3 border-b border-[#C9A55C]/10">
+          <h3 className="text-xs font-medium text-[#A8A095]">Chat</h3>
+          <span className="text-[10px] text-[#6B6560]">{messages.length} messages</span>
+        </div>
+        
+        <div ref={chatRef} className="flex-1 overflow-y-auto p-4 space-y-3">
+          {messages.length === 0 ? (
+            <p className="text-center text-xs text-[#6B6560] py-8">
+              No messages yet
+            </p>
+          ) : (
+            messages.map(msg => {
+              const isMine = msg.senderId === uid;
+              const time = msg.createdAt?.toDate
+                ? msg.createdAt.toDate().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+                : '';
+              return (
+                <div key={msg.id} className={cn('flex flex-col', isMine ? 'items-end' : 'items-start')}>
+                  <div className={cn(
+                    'chat-message',
+                    isMine ? 'chat-message-mine' : 'chat-message-other'
+                  )}>
+                    {msg.text}
                   </div>
-                );
-              })
-            )}
-          </div>
-          <form onSubmit={sendMessage} className="p-3 sm:p-4 border-t border-[rgba(212,175,55,0.15)] bg-black/20 flex gap-2 sm:gap-3">
-            <input
-              type="text"
-              value={chatText}
-              onChange={e => setChatText(e.target.value)}
-              disabled={game.status === 'waiting'}
-              placeholder={game.status === 'waiting' ? 'Waiting...' : 'Message...'}
-              className="flex-1 px-3 sm:px-4 py-2 bg-[#12100E] border border-[#4a3a2a] rounded-[4px] text-xs sm:text-sm text-[#E6D5B8] placeholder:text-[#E6D5B8]/40 focus:outline-none focus:border-[#D4AF37] disabled:opacity-50"
-            />
-            <button
-              type="submit"
-              disabled={!chatText.trim() || game.status === 'waiting'}
-              className="luxury-btn-primary px-3 sm:px-4 py-2 rounded-[4px] disabled:opacity-50"
-            >
-              <Send size={14} className="sm:w-4 sm:h-4" />
-            </button>
-          </form>
+                  {time && (
+                    <span className="text-[9px] text-[#6B6560] mt-1 px-1">{time}</span>
+                  )}
+                </div>
+              );
+            })
+          )}
         </div>
+
+        <form onSubmit={sendMessage} className="p-3 border-t border-[#C9A55C]/10 flex gap-2">
+          <input
+            type="text"
+            value={chatText}
+            onChange={e => setChatText(e.target.value)}
+            disabled={game.status === 'waiting'}
+            placeholder={game.status === 'waiting' ? 'Waiting...' : 'Type a message...'}
+            className="chat-input flex-1"
+          />
+          <button
+            type="submit"
+            disabled={!chatText.trim() || game.status === 'waiting'}
+            className="btn btn-primary !p-3"
+          >
+            <Send size={16} />
+          </button>
+        </form>
       </div>
     </div>
   );
-                 }
+}

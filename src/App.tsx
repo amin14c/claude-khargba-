@@ -5,7 +5,7 @@ import { onAuthStateChanged, signOut, User } from 'firebase/auth';
 import { doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore';
 import Auth from './components/Auth';
 import GameLobby from './components/Game';
-import { LogOut } from 'lucide-react';
+import { LogOut, Globe, ChevronDown } from 'lucide-react';
 import './i18n';
 
 type Lang = 'ar' | 'fr' | 'en' | 'tzm';
@@ -63,89 +63,115 @@ export default function App() {
     setLangSelected(true);
   };
 
+  // Language Selection Screen
   if (!langSelected) {
     return (
-      <div className="min-h-screen flex items-center justify-center p-4">
-        <div className="luxury-panel p-10 max-w-sm w-full text-center space-y-8">
-          <div className="w-20 h-20 rounded-full flex items-center justify-center text-5xl font-display mx-auto border-2 border-[#D4AF37] luxury-text-gold shadow-[0_0_20px_rgba(212,175,55,0.2)]">
-            ⴷ
+      <div className="min-h-screen flex items-center justify-center p-6 bg-[#0A0908]">
+        <div className="card-elevated p-8 w-full max-w-sm text-center space-y-8 animate-scale-in">
+          {/* Logo */}
+          <div className="flex flex-col items-center gap-4">
+            <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-[#C9A55C] to-[#8B7340] flex items-center justify-center shadow-lg">
+              <span className="text-4xl font-display text-[#0A0908]">D</span>
+            </div>
+            <div>
+              <h1 className="text-2xl font-display text-gold-glow">Khargba</h1>
+              <p className="text-sm text-[#6B6560] mt-1">Desert Strategy Game</p>
+            </div>
           </div>
-          <h2 className="text-xl font-bold uppercase tracking-[0.2em] luxury-text-gold font-display">
-            Select Language
-          </h2>
-          <div className="flex flex-col gap-3">
-            {LANGS.map(({ code, label }) => (
-              <button
-                key={code}
-                onClick={() => selectLang(code)}
-                className="luxury-btn w-full py-3 rounded text-sm font-bold font-display"
-              >
-                {label}
-              </button>
-            ))}
+          
+          {/* Language Options */}
+          <div className="space-y-3">
+            <p className="text-xs text-[#6B6560] uppercase tracking-wider">Select Language</p>
+            <div className="grid grid-cols-2 gap-3">
+              {LANGS.map(({ code, label }) => (
+                <button
+                  key={code}
+                  onClick={() => selectLang(code)}
+                  className="btn btn-ghost py-4"
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
           </div>
         </div>
       </div>
     );
   }
 
+  // Loading Screen
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center font-display luxury-text-gold tracking-[0.2em] uppercase animate-pulse">
-        {t('loading')}
+      <div className="min-h-screen flex items-center justify-center bg-[#0A0908]">
+        <div className="flex flex-col items-center gap-4">
+          <div className="w-12 h-12 rounded-xl bg-[#C9A55C]/20 flex items-center justify-center">
+            <div className="w-6 h-6 border-2 border-[#C9A55C] border-t-transparent rounded-full animate-spin" />
+          </div>
+          <p className="text-[#6B6560] text-sm">{t('loading')}</p>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen flex flex-col font-serif">
-      <header className="flex justify-between items-center px-6 py-4 border-b border-[rgba(212,175,55,0.15)] bg-black/20 backdrop-blur-sm">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-full flex items-center justify-center text-2xl font-display border border-[#D4AF37] luxury-text-gold">
-            ⴷ
+    <div className="min-h-screen flex flex-col bg-[#0A0908]">
+      {/* Header */}
+      <header className="sticky top-0 z-50 backdrop-blur-xl bg-[#0A0908]/90 border-b border-[#C9A55C]/10">
+        <div className="flex justify-between items-center px-4 sm:px-6 py-3 max-w-2xl mx-auto">
+          {/* Logo */}
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#C9A55C] to-[#8B7340] flex items-center justify-center shadow-md">
+              <span className="text-xl font-display text-[#0A0908] font-bold">D</span>
+            </div>
+            <div className="hidden sm:block">
+              <h1 className="text-base font-display text-gold">Khargba</h1>
+              <p className="text-[10px] text-[#6B6560]">Desert Strategy</p>
+            </div>
           </div>
-          <div>
-            <h1 className="text-base md:text-xl font-bold tracking-widest uppercase font-display luxury-text-gold">
-              ⴷⴰⵎⴰ ⵏ ⵜⵉⵏⵉ / داما النواة
-            </h1>
-            <p className="text-[9px] uppercase tracking-[0.3em] font-display text-[#D4AF37] opacity-50 mt-0.5">
-              Desert Strategy • 7×7 Tactical Board
-            </p>
+          
+          {/* Actions */}
+          <div className="flex items-center gap-2">
+            {/* Language Selector */}
+            <div className="relative">
+              <select
+                value={i18n.language}
+                onChange={e => i18n.changeLanguage(e.target.value)}
+                className="appearance-none bg-[#141210] text-[#C9A55C] text-xs px-3 py-2 pr-8 rounded-lg border border-[#C9A55C]/20 outline-none cursor-pointer"
+              >
+                {LANGS.map(({ code, label }) => (
+                  <option key={code} value={code} className="bg-[#0A0908]">
+                    {label}
+                  </option>
+                ))}
+              </select>
+              <ChevronDown size={14} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[#C9A55C]/60 pointer-events-none" />
+            </div>
+            
+            {/* Logout */}
+            {user && (
+              <button
+                onClick={() => signOut(auth)}
+                className="btn btn-ghost !px-3 !py-2"
+                title={t('logout')}
+              >
+                <LogOut size={16} />
+                <span className="hidden sm:inline text-xs">{t('logout')}</span>
+              </button>
+            )}
           </div>
         </div>
-        <nav className="flex items-center gap-3">
-          <select
-            value={i18n.language}
-            onChange={e => i18n.changeLanguage(e.target.value)}
-            className="bg-transparent text-[#D4AF37] outline-none cursor-pointer hidden md:block uppercase tracking-widest text-xs font-display"
-          >
-            {LANGS.map(({ code, label }) => (
-              <option key={code} value={code} className="bg-[#12100E]">
-                {label}
-              </option>
-            ))}
-          </select>
-          {user && (
-            <button
-              onClick={() => signOut(auth)}
-              className="luxury-btn px-3 py-2 rounded flex items-center gap-2 text-[10px]"
-              title={t('logout')}
-            >
-              <LogOut size={15} />
-              <span className="hidden md:inline uppercase font-bold tracking-widest">
-                {t('logout')}
-              </span>
-            </button>
-          )}
-        </nav>
       </header>
 
-      <main className="flex-1 flex flex-col px-4 md:px-10 py-8 w-full max-w-7xl mx-auto">
+      {/* Main Content */}
+      <main className="flex-1 flex flex-col">
         {user ? <GameLobby /> : <Auth />}
       </main>
 
-      <footer className="h-14 flex items-center justify-center text-[#D4AF37] opacity-30 text-[9px] font-display tracking-[0.3em] uppercase border-t border-[rgba(212,175,55,0.1)] bg-black/20">
-        Sahara Dama Online © 2026 • Rocks & Seeds Edition
+      {/* Footer */}
+      <footer className="py-4 text-center border-t border-[#C9A55C]/5">
+        <p className="text-[10px] text-[#6B6560] tracking-wide">
+          Khargba - Desert Dama Game
+        </p>
       </footer>
     </div>
   );
